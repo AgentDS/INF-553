@@ -80,3 +80,225 @@ __Meaningfulness of Analytic Answers:__
 
 <u>When looking for a property (e.g., “two people stayed at the same hotel twice”), make sure that the property does not allow so many possibilities that random data will surely produce facts “of interest.</u>
 
+
+
+## Week1 - Part 2: Large-Scale File Systems and Map-Reduce
+
+**MapReduce:**
+
+- Google’s computational/data manipulation model
+- Elegant way to work with big data
+
+
+
+Recently standard architecture for large-data emerged:
+
+- Cluster of commodity Linux nodes
+- Commodity network (ethernet) to connect them
+
+
+
+__Cluster computation:__
+
+<img src="./pic/clusterarchitecture.png" height="250px">
+
+__Large-scale Computing:__
+
+- Large-scale computing for data mining problems on commodity hardware
+
+
+
+__Cluster Computing Challenges:__
+
+- Machines fail
+- Network bottleneck:
+  - Network bandwidth= 1 Gbps
+  - Moving 10TB takes approximately 1 day
+- Distributed programming is hard!
+  - Need a simple model that hides most of the complexity
+
+
+
+### Map-Reduce
+
+Map-Reduce addresses the challenges of cluster computing:
+
+- <u>Store data redundantly</u> on multiple nodes for persistence and availability
+- <u>Move computation</u> close to minimize data movement
+- <u>Simple programming model</u> to hide the complexity of all this magic
+
+
+
+__Issue:__ Copying data over a network takes time
+
+__Idea:__
+
+- Bring computation to data
+- Store files multiple times for reliability
+
+__MapReduce addresses these problems:__
+
+- Storage infrastructure - file system (distributed file system)
+  - Google: GFS
+  - Hadoop: HDFS
+- Programming model:
+  - MapReduce
+
+#### Storage infrastructure
+
+**Typical usage pattern for distributed file system:**
+
+- Huge files
+- Data are rarely updated in place
+- Reads and appends are common
+
+
+
+__Distributed File System:__
+
+- <u>Chunk servers:</u>
+  - File is split into contiguous ***chunks***
+  - Typically each chunk is 64MB
+  - Each chunk replicated (usually 2x to 3x)
+  - Try to keep replicas in **different racks**
+- <u>Master Node:</u>
+  - also known as __Name Node__ in Hadoop's HDFS
+  - Stores __metadata__ about where files are stored
+  - Master node might be __replicated__
+- <u>Client library for file access:</u>
+  - Talks to master to find chunk servers
+  - Connects directly to chunk servers to access data
+
+
+
+<u>Chunk servers also serve as compute servers.</u>
+
+<u>Bring computation directly to the data.</u>
+
+
+
+#### Map Reduce: Overview
+
+3 steps of MapReduce:
+
+- <u>Map:</u> Extract something you care about (keys)
+- <u>Group by key:</u> Sort and shuffle
+- <u>Reduce:</u> Aggregate, summarize, filter or transform
+- Output the result
+
+
+
+
+
+- __Input:__ a set of key-value pairs
+- __Programmer specifies two methods:__
+  - Map(k,v) $\to$ <k', v'>*
+    - Takes a key-value pair and outputs a set of key-value pairs
+    - There is one Map call for every (k,v) input pair
+  - Reduce(k', <v'>*) $\to$ <k', v''>*
+    - Takes a key-value group as input, outputs key-value pairs
+    - All values v ’ with same key k’ are reduced together and processed in v ’ order
+    - There is one Reduce function call per unique key k'
+
+
+
+#### Map Reduce Summary
+
+- Map tasks
+
+  - Some number of **Map tasks** are given one or more **chunks** from a distributed file system
+  - Map code writtern by the __user__
+  - Processes chunks and produces sequence of **key-value pairs**
+
+- Master controller: Group by key/shuffle
+
+  - Collects **key-value** pairs **from each Map task**
+
+  - Divides keys among all **Reduce** tasks
+
+  - All key-value pairs with **same key** go to **same**
+
+    **Reduce task**
+
+- Reduce task
+
+  - Works on **one key** at a time
+  - Reduce code written by **user**: combines all values associated with that key in some way
+  - Produces output key-value pairs
+
+
+
+#### Word Counting Using MapReduce
+
+```c++
+map(key, value):
+// key: document name; 
+// value: text of the document 
+    for each word w in value:
+        emit(w, 1)
+```
+
+```c++
+reduce(key, values):
+// key: a word; 
+// value: an iterator over counts 
+    result = 0
+    for each count v in values: 
+        result += v
+    emit(key, result)
+```
+
+
+
+#### Word Length Histogram Using MapReduce
+
+Split the document into chunks and process each chunk on a different computer.
+
+
+
+#### Host Size Using MapReduce
+
+__Map:__ for each record, output hostname (URL, size)
+
+__Reduce:__ sum the sizes for each host
+
+
+
+#### Language Model Using MapReduce
+
+__Map:__ Extract (5-word sequence, count) from document
+
+__Reduce:__ Combine the counts
+
+
+
+#### Integers divisible by 7 Using MapReduce
+
+Design a MapReduce algorithm that takes a very large file of integers and produces as output all unique integers from the original file that are evenly divisible by 7.
+
+```C++
+map(key, value_list):
+    for v in value_list:
+        if (v % 7) == 0:
+            emit(v,1)
+```
+
+```c++
+reduce(key, values):
+    // eliminate duplicates
+    emit(key,1)
+```
+
+### Summary
+
+- Large-scale computing for data mining
+- Cluster architecture
+- How do you distribute computation?
+  - How can we make it easy to write distributed programs?
+  - Distributed file system
+  - Chunk servers and Master node
+- Map-Reduce
+  - Map tasks
+  - Master controller: Group by Key/Shuffle
+  - Reduce task
+
