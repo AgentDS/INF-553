@@ -306,10 +306,8 @@ reduce(key, values):
 
 
 
-## Week2 - MapReduce：Map-Reduce:
-Scheduling and Data Flow Combiners and Partition Functions
-
-### Map-Reduce
+## Week2 - MapReduce：Scheduling and Data Flow Combiners and Partition Functions
+Map-Reduce: 
 
 <img src="./pic/mapreduce-dataflow.png" height="250px">
 
@@ -317,9 +315,311 @@ Scheduling and Data Flow Combiners and Partition Functions
   - MapandReduceandinputfiles
 - Workflow:
   - Read inputs as a set of key-value-pairs
-  - **Map** transformsinputkv-pairsintoanewsetof k'v'-pairs
-  - Sorts&Shufflesthek'v'-pairstooutputnodes
+  - **Map** transforms input kv-pairs into a new set of k'v'-pairs
+  - Sorts & Shuffles the k'v'-pairs to output nodes
   - All k’v’-pairs with a given k’ are sent to the same **reduce**
   - **Reduce** processes all k'v'-pairs grouped by key into new k''v''-pairs
   - Write the resulting pairs to files
-- All phases are distributed with many tasks doing the work.
+- All phases are distributed with many tasks doing the work. (in parallel)
+
+
+
+### MapReduce Environment
+
+MapReduce environment takes care of:
+
+- __partitioning__ the input data
+- __scheduling__ the program's execution across a set of machines
+- performing the __group by key__ step
+  - in practice this is the bottleneck
+- handling machine __failures__
+- Managing required inter-machine __Communication__
+
+
+
+
+
+### Data Flow
+
+- <u>Input and final output</u> are stored on a <u>distributed file system</u> (HDFS):
+  - Scheduler tries to schedule map tasks “close” to physical storage location of input data
+- <u>Intermediate results</u> are stored on <u>local FS</u> of Map and Reduce workers
+- Output is often <u>input</u> to another MapReduce task.
+
+
+
+
+
+### Coordination: Master
+
+- Master node takes care of coordination:
+  - **Task status:** idle, in-progress, completed
+  - **Idle tasks** get scheduled as workers become available
+  - When a map task **completes**, it sends the master the **location and sizes** of its intermediate files, one for each reducer
+  - Master pushes this info to __reducers__
+- **Master pings workers** periodically to detect **failures**
+
+
+
+
+
+### Dealing with Failures
+
+- __Map worker__ failure:
+  - **Map tasks** completed or in-progress at worker are **reset to idle**
+  - **Reduce workers** are **notified** when task is rescheduled on another worker
+- __Reduce worker__ failure:
+  - Only **in-progress** tasks are reset to idle
+  - Reduce task is restarted
+- __Master__ failure:
+  - MapReduce task is aborted and client is notified
+
+
+
+
+
+### How many Map and Reduce jobs?
+
+- ***M*** map tasks, ***R*** reduce tasks
+- Rule of a thumb:
+  - Make ***M*** much larger than the number of nodes in the cluster
+  - One DFS chunk per map is common
+  - Improves dynamic load balancing and speeds up recovery from worker failures
+- **Usually** ***R*** **is smaller than** ***M***
+  - Because output is spread across ***R*** files
+
+
+
+
+
+### Task Granularity & Pipelining
+
+- **Fine granularity tasks:** Granularity affects the performance of parallel computers. Using fine grains or small tasks results in more parallelism and hence increases the seedup.
+  - many more **map tasks** than machines
+- Minimizes **time** for **fault recovery**
+- Can do pipeline **shuffling** with map execution
+- Better dynamic **load balancing**
+
+
+
+
+
+
+
+### Refinements 
+
+1. __Backup Tasks__
+
+   __Problem:__
+
+   - Slow workers significantly lengthen the job completion time:
+     - Other jobs on the machine
+     - Bad disks
+     - Weird things
+
+   __Solution:__
+
+   - Near end of phase, spawn backup **copies of tasks**
+     - Whichever one finishes first “wins”
+
+   __Effect:__
+
+   - Dramatically shortens job completion time.
+
+2. __Combiners__
+
+   - Combiners are **an optimization** in MapReduce
+
+     - allow for local aggregation **before the shuffle and sort**
+
+       phase
+
+   - When the **map operation outputs its pairs** they are already available in **memory**
+
+   - For efficiency reasons, sometimes it makes sense to take advantage of this fact by supplying a combiner class to perform a **reduce-type function**.
+
+   - If a combiner is used then the **map key-value** pairs are notimmediately written **to the output**
+
+     - They will be collected in lists, one list per each key value
+
+   - When a certain number of key-value pairs have been written:
+
+     - **This buffer** is flushed by passing all the values of each key to the combiner's **reduce method** and **outputting** the key-value pairs of the combine operation as if they were created by the **original map operation**.
+
+   - <u>Why use Combiners?</u> 
+
+     - Much less data needs to be copied and shuffled, useful for saving network bandwidth
+     - Works if reduce function is __commutative and associative__.
+
+3. __Partition Function__
+
+   - **Want to control how keys get partitioned**
+     - Inputs to map tasks are created by contiguous splits of input file
+     - **Reducer** needs to ensure that **records with the same** **intermediate key** **end up at the same worker**
+     - **System uses a default partition function:** hash (key) mod R
+     - **Sometimes useful to override the hash function:**
+       - want to have **alphabetical or numeric ranges** going to different Reduce tasks
+       - **hash(hostname(URL)) mod** ***R*** ensures URLs from a host end up in the same output file.
+
+### Cloud Computing
+
+- Ability to rent computing by the hour: Additional services e.g., persistent storage
+- Amazon’s “Elastic Compute Cloud” (EC2)
+  - Aster Data and Hadoop can both be run on EC2
+  - S3 (stable storage)
+  - Elastic Map Reduce (EMR)
+
+
+
+## Week 2 - MapReduce: 
+
+> __Excercises__
+>
+> __Excercise 2.3.1:__ Design MapReduce algorithms to take a very large file of integers and produce as output:
+>
+> (a) The largest integer
+>
+> (b) The average of all the integers
+>
+> (c) The same set of integers, but with each integer appearing only once
+>
+> (d) The count of the number of distinct integers in the input
+>
+> > (a) 
+> >
+> > ```scala
+> > # Map task produces (integer, 1) of the largest
+> > # value in that chunk as key, value pair
+> > Map(key, value):
+> >     emit('sub_max',max(value))
+> > 
+> > # Grouping by identifies duplicates
+> >   
+> > # Single reduce task: produces (integer, 1) of largest value
+> > Reduce(key, values):
+> >     emit('max',max(values))
+> >  
+> > # What about multiple reduce tasks?
+> > # In the shuffle step, keys could be sorted by range, so only 
+> > # look at output from the Reduce stage that has the highest 
+> > # range of keys.
+> > ```
+> >
+> > 
+> >
+> > (b)
+> >
+> > ```scala
+> > Map(key, value):
+> >     sum = 0
+> >     count=0
+> >     for num in value:
+> >         sum += num
+> >         count += 1
+> >     emit('sub_sum_cnt', (count,sum))
+> > 
+> > Reduce(key, values):
+> >     sum_total = 0
+> >     count_total = 0
+> >     for (count,sum) in values:
+> >         sum_total += sum
+> >         count_total += count
+> >     emit('avg',sum/count)
+> > ```
+> >
+> > 
+> >
+> > (c)
+> >
+> > ```scala
+> > Map(key, value):
+> >     for num in value:
+> >         emit(num,1)
+> > 
+> > # Shuffle step will group together all values for the same 
+> > # integer: (integer, [1, 1, 1, 1, ...])
+> > 
+> > # Reduce task: eliminate duplicates (ignore list of 1’s) for
+> > # each integer key and emit (integer)
+> > Reduce(uniq_num, values):
+> >     emit(uniq_num,1)
+> > ```
+> >
+> > 
+> >
+> > (d)
+> >
+> > ```scala
+> > Map1(key, value):
+> >     for num in value:
+> >         emit(num,1)
+> > 
+> > Reduce1(uniq_num, values):
+> >     emit(uniq_num,1)
+> > 
+> > Map2(num,value):
+> >     
+> > ```
+> >
+> > 
+
+
+
+### Matrix Multiply
+
+C=AXB
+A has dimensions L x M
+
+B has dimensions M x N
+
+C has dimensions L x N
+
+Matrix multiplication: C[i,k] = Sumj (A[i,j] *B[j,k])
+
+**In the map phase:**
+
+- for each element (i,j) of A**, emit ((i,k), A[i,j])** for **k in 1..N**
+  -  Better: emit ((i,k)(‘A’, i, k, A[i,j])) for k in 1..N
+
+- for each element (j,k) of B, **emit ((i,k), B[j,k])** for **i in 1..L**
+  -  Better: emit ((i,k)(‘B’, i, k, B[j,k])) for i in 1..L
+
+
+
+**In the reduce phase**:
+
+- One reducer per output cell, emit 
+  - key = (i,k) 
+  - value = $Sum_j (A[i,j] \cdot B[j,k])$
+
+
+
+#### Two-phase Map Reduce Matrix Multiply
+
+**A better way:** use two map reduce jobs.
+
+__1st Map Function:__
+
+- For each matrix element  A[ij] : emit( j , (A, i, A[i,j]))
+- For each matrix element B[jk] : emit( j , (B, k, B[j,k]))
+
+__1st Reduce task for key j:__
+
+- emit((i,k), A[i,j]*B[j,k]) for any [i,k]:
+  - C[i,k] need that
+
+
+
+__2nd Map Function:__
+
+```scala
+map(key,value):
+#Let the pair of (( (i,k), (A[ij] * B[jk])) pass through
+                  
+reduce(key,values):
+#each (i,k) will have its own reduce function
+    emit((i,k),Sum(values))
+```
+
+
+

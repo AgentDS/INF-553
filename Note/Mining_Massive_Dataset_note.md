@@ -119,3 +119,47 @@ __How to sove the problem of "skew"?__
 
 ##### 2.2.5 Details of MapReduce Execution
 
+1. the user program forks a Master controller process and some number of Worker processes at different compute nodes.
+   - a Worker handles either Map tasks (a Map worker) or Reduce tasks (a Reduce worker), but not both.
+   - responsibilities of the master:
+     - create some number of Map tasks and some number of Reduce tasks, these numbers being selected by the user program
+     - assign these tasks to Worker processes
+     - need to limit the number of Reduce tasks, since it is necessary for each Map task to create an intermediate file for each Reduce task, and if there are too many Reduce tasks the number of intermediate files explodes.
+     - keeps track of the status of each Map and Reduce task (idle, executing at a particular Worker, or completed)
+2. a Worker process reports to the Master when it finishes a task
+3. a new task is scheduled by the Master for that Worker process
+4. The Map task creates a file for each Reduce task on the local disk of the Worker that executes the Map task.
+5. When a Reduce task is assigned by the Master to a Worker process, that task is given all the files that form its input.
+6. The Reduce task executes code written by the user and writes its output to a file that is part of the surrounding distributed file system.
+
+
+
+- Each Map task is assigned one or more chunks of the input file(s) and executes on it the code written by the user.
+
+
+
+#### 2.2.6 Coping With Node Failures
+
+__Worst case:__ the compute node at which the Master is executing fails, then the entire MapReduce job must be restarted <u>(other failures will be managed by the Master)</u>.
+
+
+
+__Map worker failures:__ 
+
+- the failure will be detected by the Master, because it periodically pings the Worker processes.
+- All the Map tasks that were assigned to this Worker will have to be redone, even if they had completed
+  - these Map tasks' output destined for the Reduce tasks resides at that compute node, and is now unavailable to the Reduce tasks.
+- The Master sets the status of each of these Map tasks to idle, and will schedule them on a Worker when one becomes available. 
+- The Master must also inform each Reduce task that the location of its input from that Map task has changed.
+
+
+
+__Reduce worker failures:__
+
+- The Master simply sets the status of its currently executing Reduce tasks to idle.
+- These Reduce tasks will be rescheduled on another reduce worker later.
+
+
+
+### 2.3 Algorithms Using MapReduce
+
