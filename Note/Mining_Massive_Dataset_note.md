@@ -56,3 +56,44 @@ In DFS:
 
 ### 2.2 MapReduce
 
+In MapReduce, customer need to write __Map__ function and __Reduce__ function, while the system manages the parallel execution, coordination of tasks that execute Map or Reduce, and also deals with possibility that one of these tasks will fail to execute.
+
+
+
+A MapReduce computation executes as follows:
+
+1. Some number of Map tasks each are given one or more chunks from a distributed file system. These Map tasks turn the chunk into a sequence of key-value pairs. The way key-value pairs are produced from the input data is determined by the code written by the user for the Map function.
+2. The key-value pairs from each Map task are collected by a __master controller__ and sorted by key. The keys are divided among all the Reduce tasks, so all key-value pairs with the same key wind up at the same Reduce task.
+3. The Reduce tasks work on one key at a time, and combine all the val- ues associated with that key in some way. The manner of combination of values is determined by the code written by the user for the Reduce function.
+
+
+
+The __Map__ function emits key-value pairs like ``(k,v)``, the __Reduce__ function receive keys with all their values like ``(k, [v,w,...])``.
+
+<img src="./pic/mapreduce-computation.png" height="300px">
+
+
+
+#### 2.2.1 The Map Tasks
+
+- __input files:__ consisting of elements, which can be any type: a tuple or a document.
+- takes an input element as its argument
+- produces zero or more key-value pairs
+- __Key:__ a Map task can produce several key-value pairs with the same key, even from the same element
+
+
+
+#### 2.2.2 Grouping by Key
+
+The grouping is performed by the system. The master controller process knows how many Reduce tasks there will be, say $r$ such tasks. The master controller picks a hash function that applies to keys and produces a bucket number from $0$ to $r − 1$. Each key that is output by a Map task is hashed and its key-value pair is put in one of $r$ local files.
+
+
+
+For each key $k$, the input to the Reduce task that handles key $k$ is a pair of the form $(k, [v_1, v_2, \ldots , v_n])$, where $(k,v_1)$, $(k,v_2)$,...,$(k,v_n)$ are all the key-value pairs with key $k$ coming from all the Map tasks.
+
+
+
+#### 2.2.3 The Reduce Tasks
+
+
+
