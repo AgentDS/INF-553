@@ -1,4 +1,4 @@
-# INF-553 Foundations and Applications of Data Mining 2019 Fall
+# niINF-553 Foundations and Applications of Data Mining 2019 Fall
 by Dr. Anna Farzindar  
 
 [TOC]
@@ -302,3 +302,24 @@ reduce(key, values):
   - Master controller: Group by Key/Shuffle
   - Reduce task
 
+
+
+
+
+## Week2 - MapReduce：Map-Reduce:
+Scheduling and Data Flow Combiners and Partition Functions
+
+### Map-Reduce
+
+<img src="./pic/mapreduce-dataflow.png" height="250px">
+
+- Programmer specifies:
+  - MapandReduceandinputfiles
+- Workflow:
+  - Read inputs as a set of key-value-pairs
+  - **Map** transformsinputkv-pairsintoanewsetof k'v'-pairs
+  - Sorts&Shufflesthek'v'-pairstooutputnodes
+  - All k’v’-pairs with a given k’ are sent to the same **reduce**
+  - **Reduce** processes all k'v'-pairs grouped by key into new k''v''-pairs
+  - Write the resulting pairs to files
+- All phases are distributed with many tasks doing the work.
