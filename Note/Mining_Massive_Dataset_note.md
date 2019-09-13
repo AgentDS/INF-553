@@ -95,5 +95,27 @@ For each key $k$, the input to the Reduce task that handles key $k$ is a pair of
 
 #### 2.2.3 The Reduce Tasks
 
+- __Input (argument):__ a pair consisting of a key and its list of associated values
+- __Output:__ a sequence of zero or more key-value pairs
+- a Reduce task receives one or more keys and their associated value lists (a Reduce task executes one or more reducers)
+- The outputs from all the Reduce tasks are merged into a single file
 
+
+
+#### 2.2.4 Combiners
+
+Sometimes, a Reduce function is associative and commutative. That is, the values to be combined can be combined in any order, with the same result.
+
+When the Reduce function is associative and commutative, we can push some of what the reducers do to the Map tasks.
+
+
+
+__How to sove the problem of "skew"?__
+
+- Use fewer Reduce tasks than there are reducers
+- Use more Reduce tasks than there are compute nodes
+
+
+
+##### 2.2.5 Details of MapReduce Execution
 
