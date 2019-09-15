@@ -594,7 +594,7 @@ Matrix multiplication: C[i,k] = Sumj (A[i,j] *B[j,k])
 
 
 
-#### Two-phase Map Reduce Matrix Multiply
+### Two-phase Map Reduce Matrix Multiply
 
 **A better way:** use two map reduce jobs.
 
@@ -622,4 +622,42 @@ reduce(key,values):
 ```
 
 
+
+### Relational Join
+
+#### Example 1
+
+<img src="./pic/relational_join.png" height="250px">
+
+```scala
+Map(key,value):
+    for each row in table:
+        # key=999999999
+        # value=(Employee, Sue, 999999999)
+        emit(key,value)
+# Group by key: groups together all values (tuples) 
+# associated with each key
+
+
+# Reduce task: emit joined values (without table names)
+Reduce(key,values):
+    for item in values:
+        emit([name,key,key,deptname],1)
+```
+
+#### Example 2
+
+
+
+
+
+
+
+
+
+### Cost Measures for Algorithms
+
+- *Communicationcost* =**totalI/O** of all processes
+- *Elapsed communication cost* = **max of I/O** along any path
+- (*Elapsed*) *computation cost* analogous, but count only **running time of processes**.
 
