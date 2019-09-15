@@ -6,7 +6,10 @@
 # @File    : siqi_liang_task3.py
 # @Software: PyCharm
 
-import pyspark as ps
-
-if __name__=="__main__":
-    print("x")
+from pyspark import SparkContext
+sc = SparkContext( 'local', 'test')
+logFile = "file:///opt/spark/README.md"
+logData = sc.textFile(logFile, 2).cache()
+numAs = logData.filter(lambda line: 'a' in line).count()
+numBs = logData.filter(lambda line: 'b' in line).count()
+print('Lines with a: %s, Lines with b: %s' % (numAs, numBs))

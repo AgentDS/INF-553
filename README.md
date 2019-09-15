@@ -102,7 +102,8 @@ Now, run the example to see whether install successfully:
 
 ```bash
 cd /opt/spark/bin
-run-example SparkPi 10
+# use grep to get clean output result
+run-example SparkPi 2>&1 | grep "Pi is"  
 ```
 
 My result:![sparkexample](./Note/pic/sparkexample.png)
@@ -123,13 +124,42 @@ and activate the environment when finished
 conda activate inf553
 ```
 
-Now install ``Pyspark`` using ``conda``:
+Now install ``Pyspark`` using ``pip`` :
 
 ```bash
-conda install -c conda-forge pyspark
+pip install pyspark==2.3.3
 ```
 
-
+> I tried to install ``pyspark==2.4.4``, but this could cause incompatibility with Spark JVM libraries since Spark 2.3.3 is used!!! If use ``pyspark==2.4.4``, running test file showed [here](#testfile)  will end with error:
+>
+> ```python
+> Traceback (most recent call last):
+>   File "test.py", line 5, in <module>
+>     numAs = logData.filter(lambda line: 'a' in line).count()
+>   File "//anaconda3/envs/inf553/lib/python3.6/site-packages/pyspark/rdd.py", line 403, in filter
+>     return self.mapPartitions(func, True)
+>   File "//anaconda3/envs/inf553/lib/python3.6/site-packages/pyspark/rdd.py", line 353, in mapPartitions
+>     return self.mapPartitionsWithIndex(func, preservesPartitioning)
+>   File "//anaconda3/envs/inf553/lib/python3.6/site-packages/pyspark/rdd.py", line 365, in mapPartitionsWithIndex
+>     return PipelinedRDD(self, f, preservesPartitioning)
+>   File "//anaconda3/envs/inf553/lib/python3.6/site-packages/pyspark/rdd.py", line 2514, in __init__
+>     self.is_barrier = prev._is_barrier() or isFromBarrier
+>   File "//anaconda3/envs/inf553/lib/python3.6/site-packages/pyspark/rdd.py", line 2414, in _is_barrier
+>     return self._jrdd.rdd().isBarrier()
+>   File "//anaconda3/envs/inf553/lib/python3.6/site-packages/py4j/java_gateway.py", line 1257, in __call__
+>     answer, self.gateway_client, self.target_id, self.name)
+>   File "//anaconda3/envs/inf553/lib/python3.6/site-packages/py4j/protocol.py", line 332, in get_return_value
+>     format(target_id, ".", name, value))
+> py4j.protocol.Py4JError: An error occurred while calling o23.isBarrier. Trace:
+> py4j.Py4JException: Method isBarrier([]) does not exist
+>         at py4j.reflection.ReflectionEngine.getMethod(ReflectionEngine.java:318)
+>         at py4j.reflection.ReflectionEngine.getMethod(ReflectionEngine.java:326)
+>         at py4j.Gateway.invoke(Gateway.java:274)
+>         at py4j.commands.AbstractCommand.invokeMethod(AbstractCommand.java:132)
+>         at py4j.commands.CallCommand.execute(CallCommand.java:79)
+>         at py4j.GatewayConnection.run(GatewayConnection.java:238)
+>         at java.lang.Thread.run(Thread.java:748)
+> ```
 
 Add these codes to ``~/.zshrc`` or ``~/.bash_profile`` file to enable python/ipython from conda environment to use PySpark:
 
@@ -148,6 +178,27 @@ or
 
 ```bash
 source ~/.bash_profile
+```
+
+
+
+Now run the <a name="testfile">``test.py``</a> showed below to see the result:
+
+```python
+# test.py
+from pyspark import SparkContext
+sc = SparkContext( 'local', 'test')
+logFile = "file:///opt/spark/README.md"
+logData = sc.textFile(logFile, 2).cache()
+numAs = logData.filter(lambda line: 'a' in line).count()
+numBs = logData.filter(lambda line: 'b' in line).count()
+print('Lines with a: %s, Lines with b: %s' % (numAs, numBs))
+```
+
+The running result is
+
+```python
+Lines with a: 61, Lines with b: 30
 ```
 
 
