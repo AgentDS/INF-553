@@ -230,10 +230,12 @@ Lines with a: 61, Lines with b: 30
 
 #### Install Scala
 
-Download, then run:
+Download scala 2.11.8 from the [link](https://www.scala-lang.org/download/2.11.8.html), then run:
 
 ```bash
-sudo cp -R scala-2.11.12.tgz /usr/local/scala
+sudo tar -zxf scala-2.11.8.tgz -C /usr/local
+cd /usr/local/
+sudo mv ./scala-2.11.8/ ./scala
 ```
 
 Add code to ``~/.zshrc`` or ``~/.bash_profile``:
@@ -242,7 +244,9 @@ Add code to ``~/.zshrc`` or ``~/.bash_profile``:
 export PATH="/usr/local/scala/bin:$PATH"
 ```
 
+Now run Scala in the terminal:![scala](./Note/pic/scala.png)
 
+> It seems there will be problem if install Scala 2.11.12.
 
 
 
