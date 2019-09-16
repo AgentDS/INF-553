@@ -182,7 +182,7 @@ source ~/.bash_profile
 
 
 
-Now run the <a name="testfile">``test.py``</a> showed below to see the result:
+Now run the <a name="testfile">``test.py``</a> using ``spark-submit test.py``  to see the result. the ``test.py`` is showed below:
 
 ```python
 # test.py
@@ -200,6 +200,31 @@ The running result is
 ```python
 Lines with a: 61, Lines with b: 30
 ```
+
+> There might be a lot of LOG informations in the print out result when running the ``spark-submit`` as showed:![loginfo](./Note/pic/loginfo.png)
+>
+>  We can manage to hide them. 
+>
+> Go to the spark configure folder:
+>
+> ```
+> cd /opt/spark/conf
+> ```
+>
+> Copy the ``log4j.properties.template`` file and edit the copy:
+>
+> ```bash
+> cp log4j.properties.template log4j.properties
+> vim log4j.properties
+> ```
+>
+> Then you can see in the Lin 19, there is ``log4j.rootCategory=INFO, console``:
+>
+> ![sparklog](./Note/pic/sparklog.png)
+>
+> Change ``INFO`` to ``WARN`` and save the file. Then it is done!
+
+
 
 
 

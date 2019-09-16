@@ -7,7 +7,7 @@
 # @Software: PyCharm
 
 from pyspark import SparkContext
-sc = SparkContext( 'local', 'test')
+sc = SparkContext('local', 'test')
 logFile = "file:///opt/spark/README.md"
 logData = sc.textFile(logFile, 2).cache()
 numAs = logData.filter(lambda line: 'a' in line).count()
