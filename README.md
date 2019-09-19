@@ -254,3 +254,19 @@ Now run Scala in the terminal:![scala](./Note/pic/scala.png)
 
 - HW1
 
+  - Task 1: use ``user.json``
+
+    
+
+  - Task 2: use ``user.json``
+
+  - Task 3: use ``review.json`` and ``business.json``
+
+  - 
+
+- HW2
+
+- HW3
+
+- HW4
+

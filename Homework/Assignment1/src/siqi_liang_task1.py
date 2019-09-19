@@ -7,3 +7,11 @@
 # @Software: PyCharm
 
 import pyspark as ps
+import sys
+
+if __name__ == '__main__':
+    argv = sys.argv
+    user_file = argv[1]
+    output_file = argv[2]
+    print("Input: ", user_file)
+    print("Output: ", output_file)
