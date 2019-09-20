@@ -814,3 +814,149 @@ Given a __support threshold $s$__, sets of items that appear in at least  $s$  b
 - __Assume:__ not too many frequent itemsets or candidates for high support, high confidence association rules
   - Not so many that they can’t be acted upon
   - Adjust support threshold to avoid too many frequent itemsets
+
+
+
+### Find Frequent Itemsets
+
+#### Computation Model
+
+- Typically, market basket data are kept in **flat files** rather than in a database system
+  - Stored **on disk because they are very large files**
+  - Stored **basket-by-basket**
+  - **Goal:** Expand baskets into pairs, triples, etc. as you read baskets
+- The true cost of mining disk-resident data is usually the **number of disk I/O**’**s**
+- In practice, association-rule algorithms read the data in ***passes*** **– all baskets read in turn**
+- we measure the cost by the **number of passes** an algorithm takes.
+
+
+
+#### Main-Memory Bottleneck
+
+For many frequent-itemset algorithms, main memory is the critical resource:
+
+- As we read baskets, we need to **count something, e.g., occurrences of pairs**
+- The number of different things we can count is limited by main memory
+- Swapping counts in/out is a disaster
+- Algorithms are designed so that counts can fit into main memory
+
+
+
+#### Finding Frequent Pairs
+
+- The hardest problem often turns out to be finding the **frequent pairs**
+  - Often frequent pairs are common, frequent triples are rare
+  - Probability of being frequent drops exponentially with size; number of sets grows more slowly with size
+- We will concentrate on pairs, then extend to larger itemsets.
+
+
+
+
+
+#### Details of Main-Memory Counting
+
+Two approaches:
+
+- Count all pairs, using a **triangular matrix**: $A[i,j]$ is recoded only if $i<j$
+  - requires only <u>4 bytes/pair</u>, but requires a count for each pair (assume integers are 4 bytes)
+- Keep a **table of triples  $[i,j,c]$=** “**the count of the pair of items** $\{i,j\}$ is  $c$”
+  - requires <u>12 bytes</u>, but only for those pairs with count > 0 
+  - Plus some additional overhead for a hashtable
+
+
+
+##### Triangular-Matrix Approach
+
+- Number item $1,2,\ldots$
+
+  - Requires table of size  $O(n)$  to convert item names to consecutive integers
+
+- Count each pair of items $\{i,j\}$  so that  $i<j$
+
+-  Keep pair counts in lexicographic order:
+
+  $\{1,2\},\;\{1,3\},\ldots,\;\{1,n\},\; \{2,3\},\;\{2,4\},\ldots,\;\{2,n\},\ldots$
+
+- Find the pair  $\{i,j\}$ ($i<j$) is at the position $(i-1)(n-i/2) + j - i$
+
+- Total number of pairs $n(n–1)/2$; total bytes= $2n^2$ 
+
+- 4 bytes for each pair
+
+
+
+##### Tabular Approach
+
+- Total bytes used is  $12p$, where  $p$  is the number of pairs that actually occor
+  - Beats triangular matrix if at most  $1/3$  of possible pairs actually occur  
+- May require xtra space for retrieval structure, e.g., a hash table (may be  $16p$  if use linked list for each pair)
+- 
+
+
+
+### A-Priori Algorithm
+
+- A **two-pass** approach called ***A-Priori*** limits the need for main memory
+
+- Key idea: ***monotonicity***
+
+  - If a set of items  $I$  appears at least  $s$  times, so does every **subset**  $J$  of  $I$ 
+
+- **Contrapositive for pairs:**
+
+  If item  $i$  does not appear in  $s$  baskets, then no pair including  $i$  can appear in  $s$  baskets
+
+
+
+__A-Priori Algorithm:__
+
+- __Pass 1:__ Read baskets and count in main memory the occurrences of each item
+
+  - Requires only memory proportional to #items
+
+  - Items that appear at least  $s$  times are the ***frequent items***
+    - At the end of pass 1, after the complete input file has been processed, check the count for each item
+    - If  $\text{count} > s$, then that item is frequent: saved for the next pass
+    - Pass 1 identifies frequent itemsets of size 1
+
+- __Pass 2:__ Read baskets again and count in main memory only those pairs of items where both were found in Pass 1 to be frequent
+
+  Requires:
+
+  - **Memory proportional to square of** ***frequent*** **items only** (to hold counts of pairs)
+  - **List of the frequent items from the first pass** (so you know what must be counted)
+  - Pairs of items that appear at least $s$ times are the ***frequent pairs***:
+    - At the end of pass 2, check the count for each pair
+    - If  $\text{count} > s$, then that pair is frequent
+  - Pass 2 identifies frequent pairs: itemsets of size 2
+
+
+
+#### Details
+
+- You can use the triangular matrix method with  $n$ = <u>number of frequent items</u>
+  - May save space compared with storing triples
+- **Trick:** **re-number frequent items 1,2,...** and keep a table relating new numbers to original item numbers.
+
+
+
+**What About Larger Frequent Itemsets? Frequent Triples, Etc.**
+
+- For each  $k$, we construct two sets of  $k$-tuples (sets of size  $k$):
+  - $C_k$ = ***candidate***  $k$-***tuples*** = those that might be frequent sets (support $> s$) based on information from the pass for  $k–1$
+  - $L_k$ = the set of **truly frequent**  $k$-***tuples***
+
+<img src="./pic/a-priori.png" height="150px">
+
+
+
+__A-Priori for All Frequent Itemsets:__
+
+- One pass for each  $k$ (items size)
+- Needs room in main memory to count each candidate  $k$-tuple
+- For typical market-basket data and reasonable support (e.g., $1\%$), $k=2$  requires the most memory
+- At the $k^{th}$ path, you need space to count each member of $C_k$
+- $C_{k+1}$ = $(k+1)$-sets, each $k$ of which is in $L_k$
+
+
+
