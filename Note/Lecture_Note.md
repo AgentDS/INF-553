@@ -471,7 +471,7 @@ MapReduce environment takes care of:
 
 
 
-## Week 2 - MapReduce: 
+## Week2 - MapReduce: 
 
 > __Excercises__
 >
@@ -661,3 +661,156 @@ Reduce(key,values):
 - *Elapsed communication cost* = **max of I/O** along any path
 - (*Elapsed*) *computation cost* analogous, but count only **running time of processes**.
 
+
+
+## Week3 - Finding Frequent Itemsets
+
+__Frequent Itemsets and Association Rules:__ Family of techniques for characterizing data: discovery of frequent itemsets
+
+
+
+__Outline:__
+
+- Introduce market-basket model of data
+- Define frequent itemsets
+- Discover association rules
+  - Confidence and interest of rules
+- A-Priori Algorithm and variations
+
+
+
+### Market-basket model
+
+__Goal:__ Identify items that are bought together by <u>sufficiently many customers</u>.
+
+__Approach:__ Process the sales data to find dependencies among items.
+
+
+
+__The market-basket model:__
+
+- A large set of __items__: things sold in a supermarket 
+- A large set of __baskets__
+- each basket is a small subset of items: the things one customer buys on one day
+- Want to discover Association Rules: People who bought {x,y,z} tend to buy {v,w}
+  - Influences setting of prices, what to put on sale when, product placement on store shelves
+  - Recommendersystems:Amazon,Netflix,etc.
+- Really a **general many-many mapping** (association) between two kinds of things: items and baskets
+  - ask about connections among “items,” not“baskets
+- The technology focuses on <u>common events</u>, not rare events
+  - Don’t need to focus on identifying __all__ association rules
+  - Want to focus on common events, <u>focus pricing strategies or product recommendations</u> on those items or association rules.
+
+
+
+#### Applications
+
+##### Identify items bought together
+
+__Item__ = products
+
+__Baskets__ = sets of products someone bought in one trip to the store
+
+**Real market baskets:** Stores (Walmart, Target, Ralphs, etc.) keep terabytes of data about what items customers buy together
+
+- Tells how <u>typical</u> customers navigate stores
+- Lets them <u>position tempting items</u>
+- Need the rule to occur frequently, or no profits!
+
+
+
+##### Plagiarism detection
+
+__Item__ = sentences
+
+__Baskets__ = documents containing those sentences
+
+- Item/document is “in” a basket if sentence is in the document
+- May seem backward, but relationship between baskets and items is many-to-many
+
+Look for items that appear together in several baskets: Multiple documents share sentence(s)
+
+Items (documents) that appear together too often could represent plagiarism.
+
+
+
+##### Identify related concepts in web documents
+
+__Item__ = Words
+
+__Baskets__ = Web pages
+
+- Baskets/documents contain items/words in the document
+- Look for sets of words that appear together in many documents
+- Ignore most common words
+- Unusual words appearing together in a large number of documents, e.g., “World” and “Cup,” may indicate an interesting relationship or joint concept.
+
+
+
+
+
+##### Drug interactions
+
+__Items__ = Drugs and side effects
+
+__Baskets__ = patients
+
+- Has been used to detect combinations of drugs that result in particular side-effects
+- But requires extension: Absence of an item needs to be observed as well as presence!!
+
+
+
+
+
+### Define Frequent Itemsets
+
+#### Support
+
+**Simplest question:** Find sets of items that appear**“**frequently**” **in the baskets
+
+__Support for itemset $I$__ = the number of baskets containing all items in $I$.
+
+Given a __support threshold $s$__, sets of items that appear in at least  $s$  baskets are called ***frequent itemsets.***
+
+
+
+### Association Rules
+
+- Basket  $I$ contains  $\{i_1, i_2, \ldots, i_k\}$
+
+- Rule  $\{i_1, i_2, \ldots, i_k\} \to j$  means: if a basket contains all of   $\{i_1, i_2, \ldots, i_k\}$  then it is ***likely*** to contain $j$.
+
+- ***Confidence*** of this association rule is the probability of  $j$  given  $\{i_1, i_2, \ldots, i_k\}$:
+
+  - Ratio of support for  $I \cup \{j\}$  with support for  $I$
+
+  - Support for  $I$: number of baskets containing  $I$:
+    $$
+    \text{conf}(I \to j) = \frac{\text{support}(I \cup j)}{\text{support}(I)}
+    $$
+
+
+
+#### Interesting Association Rules 
+
+- Not all high-confidence rules are interesting
+
+- Interest of an association rule  $I \to j$: difference between its confidence and the fraction of baskets that contain  $j$
+  $$
+  \text{Interest}(I \to j) = \text{conf}(I \to j) - Pr[I]
+  $$
+
+  - Interesting rules are those with high positive or negative interest values (usually above 0.5)
+  - High positive/negative interest means presence of  $I$  **encourages** or **discourages** presence of  $j$
+
+
+
+#### Finding Useful Association Rules
+
+- find all association rules with $\text{support} ≥ s$  and  $\text{confidence} ≥ c$ 
+  - “support” of an association rule is the support of the set of items on the left
+- __Hard part:__ finding the __frequent itemsets__
+  - if  $\{i_1, i_2, \ldots, i_k\} \to j$  has high support and confidence, then both  $\{i_1,i_2,\ldots,i_k\}$  and $\{i_1, i_2, \ldots, i_k, j\}$  will be "frequent"
+- __Assume:__ not too many frequent itemsets or candidates for high support, high confidence association rules
+  - Not so many that they can’t be acted upon
+  - Adjust support threshold to avoid too many frequent itemsets
