@@ -7,8 +7,12 @@
 # @Software: PyCharm
 
 from pyspark import SparkContext
+import json
 
-if __name__ == "__main__":
+
+
+
+def RDD_basic():
     sc = SparkContext()
     intRDD = sc.parallelize([3, 1, 2, 5, 5])
     stringRDD = sc.parallelize(['Apple', 'Orange', 'Grape', 'Banana', 'Apple'])
@@ -23,6 +27,7 @@ if __name__ == "__main__":
     print(sRDD[0].collect())
     print(sRDD[1].collect())
 
+    print("Group by:")
     result = intRDD.groupBy(lambda x: x % 2).collect()
     print(sorted([(x, sorted(y)) for (x, y) in result]))
 
@@ -49,7 +54,7 @@ if __name__ == "__main__":
     print("Filter using values: ")
     print(kvRDD1.filter(lambda x: x[1] < 5).collect())
     print("MapValues:")
-    print(kvRDD1.mapValues(lambda x: x**2).collect())
+    print(kvRDD1.mapValues(lambda x: x ** 2).collect())
     print("Sort by key:")
     print(kvRDD1.sortByKey().collect())
     print(kvRDD1.sortByKey(ascending=True).collect())
@@ -62,3 +67,26 @@ if __name__ == "__main__":
     print(kvRDD1.leftOuterJoin(kvRDD2).collect())
     print(kvRDD1.rightOuterJoin(kvRDD2).collect())
     print(kvRDD1.subtractByKey(kvRDD2).collect())
+
+    print("\n\nKey-Value actions:")
+    print(kvRDD1.first())
+    print(kvRDD1.take(2))
+    print(kvRDD1.first()[0])
+    print(kvRDD1.first()[1])
+    print("Count by key:")
+    print(kvRDD1.countByKey())
+    print(kvRDD1.lookup(3))
+
+    print("\n\nPersistent RDD:")
+    kvRDD1.persist()
+    kvRDD1.unpersist()
+
+if __name__ == "__main__":
+    # path = "/Users/liangsiqi/Documents/Dataset/yelp_dataset/"
+    # user_file = "user.json"
+    # # users = [json.loads(line) for line in open(path + user_file, 'r')]
+    # # print(users[0])
+    # sc = SparkContext()
+    # userRDD = sc.textFile(path + user_file)
+    # print(userRDD.first())
+    RDD_basic()
