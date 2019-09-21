@@ -24,10 +24,12 @@ if __name__ == '__main__':
 
     # B. average number of reviews
     review_cnt_RDD = userRDD_json.map(lambda x: [x['user_id'], x['review_count']])
+    review_cnt_RDD.persist()
     review_cnt_mean = review_cnt_RDD.values().mean()
 
     # C. number of distinct user names
     user_nameRDD = userRDD_json.map(lambda x: x['name']).groupBy(lambda x: x)
+    user_nameRDD.persist()  # saved in memory after the first time it is computed
     user_name_cnt = user_nameRDD.count()
 
     # D. number of users joined in 2011
