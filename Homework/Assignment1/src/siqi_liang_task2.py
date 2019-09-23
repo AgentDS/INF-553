@@ -51,7 +51,6 @@ if __name__ == '__main__':
     sc.stop()
 
     # use given partition number
-
     sc.stop()
     sc = SparkContext()
     start2 = time()
