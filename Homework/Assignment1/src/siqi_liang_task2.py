@@ -47,7 +47,7 @@ if __name__ == '__main__':
     review_cnt_RDD = userRDD_json_default.map(lambda x: [x['user_id'], x['review_count']])
     most_review = review_cnt_RDD.sortBy(lambda x: x[1], ascending=False).take(10)
     end1 = time()
-    default_exe_time = int(end1 - start1)
+    default_exe_time = end1 - start1
     sc.stop()
 
     # use given partition number
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     top10_reviews = top10_within_partitionRDD.flatMap(lambda x: x).takeOrdered(10, key=lambda x: -x[1])
     end2 = time()
     print(top10_reviews)
-    customized_exe_time = int(end2 - start2)
+    customized_exe_time = end2 - start2
     # print("Time for customized %d partitions: %d s" % (customized_n_partition, customized_exe_time))
 
     explanation = ['Without customized partition functions, the program ',
