@@ -163,3 +163,109 @@ __Reduce worker failures:__
 
 ### 2.3 Algorithms Using MapReduce
 
+
+
+
+
+
+
+## Chapter 6: Frequent Itemsets
+
+### 6.1 The Market-Basket Model
+
+#### 6.1.1 Definition of Frequent Itemsets
+
+$s$ :  support threshold
+
+If  $I$  is a set of items, the support for  $I$  is the number of baskets for which  $I$  is a subset.  $I$  is frequent if its support is  $s$  or more.
+
+A doubletones cannot be frequent unless both items in the set are frequent by themselves.
+
+In frequent triple, each pair of elements in the set must be a frequent doubleton.
+
+
+
+#### 6.1.2 Applications of Frequent Itemsets
+
+1. __Related concepts:__ 
+
+   Items: words
+
+   Baskets: documents
+
+   if we ignore all the most common words, then we would hope to find among the frequent pairs some pairs of words that represent a joint concept.
+
+2. __Plagiarism:__
+
+   Items: documents
+
+   Baskets: sentences
+
+   An item/document is “in” a basket/sentence if the sentence is in the document. We look for pairs of items that appear together in several baskets. If we find such a pair, then we have two documents that share several sentences in common.
+
+3. __Biomarkers:__
+
+   Items: disease and biomarkers
+
+   Basket: each basket is a set of data about a patient
+
+
+
+#### 6.1.3 Association Rules
+
+Association rule: $I \to j$, where  $I$  is a set of items and  $j$  is an item. If all of the items in  $I$  appear in some basket, then  $j$  is likely to appear in that basket as well.
+
+We formalize the notion of “likely” by defining the __confidence of the rule  $I \to j$__  to be the ratio of the support for $I \cup \{j\}$  to the support for  $I$. Thatis, the confidence of the rule is the fraction of the baskets with all of  $I$  that also contain  $j$. 
+
+__Interest of an association rule  $I \to j$__  to be the difference between its confidence and the fraction of baskets that contain  $j$, then we would expect that the fraction of baskets including  $I$  that contain  $j$  would be exactly the same as the fraction of all baskets that contain  $j$.
+
+
+
+### 6.2 Market Baskets and the A-Priori Algorithm
+
+#### 6.2.1 Representation of Market-Basket Data
+
+We assume that the size of the file of baskets is sufficiently large that it does not fit in main memory. Thus, a major cost of any algorithm is the time it takes to read the baskets from disk.
+
+#### 6.2.2 Use of Main Memory for Itemset Counting
+
+Encode the items using hash table: Each time we seee an item in the file. we hash it. If it is already in the hash table, we can obtain its integer code from its entry in the table. If the item is not there, we assign it the next available number (from a count of the number of distinct items seen so far) and enter the item and its code into the table.
+
+
+
+ ##### The Tiangular-Matrix Method
+
+Record the count value for  $[i,j]$  in  $a[i,j]$  if and only if  $i<j$. A more space-efficient way is to use a one-dimensional  $triangular$ $array$. We store in  $a[k]$  the count for the pair  $\{i,j\}$,  with  $1 \le i < j \le n$, where
+$$
+k = (i-1)(n - \frac{i}{2}) +j - i
+$$
+The result of this layout is that the pairs are stored in lexicographic order, that is first $\{1,2\}, \{1,3\}, \ldots,\{1,n\}$, then  $\{2,3\}, \{2,4\},\ldots,\{2,n\}$, and so on, down to  $\{n−2,n−1\}, \{n−2,n\}$, and finally  $\{n−1,n\}$. 
+
+
+
+##### The Triples Method
+
+Store counts as triples  $[i,j,c]$, meaning that the count of pair  $\{i,j\}$  with  $i<j$, is  $c$. A data structure, such as a hash table with  $i$  and  $j$  as the search key, is used so we can tell if there is a triple for a given  $i$  and  $j$  and, if so, to find it quickly.
+
+The triples method does not require us to store anything if the count for a pair is 0. The triples method requires us to store three integers, rather than one, for every pair that does appear in some basket. In addition, there is the space needed for the hash table or other data structure used to support efficient retrieval.
+
+Triangular matrix will be better if at least $1/3$  of the  $(n-1)n/2$  possible pairs actually appear in some basket, while if significantly fewer than  $1/3$  of the possible pairs occur, we should consider using the triples method.
+
+
+
+#### 6.2.3 Monotonicity of Itemsets
+
+__Monotonicity for itemsets:__ If a set  $I$  of items is frequent, then so is every subset of  $I$.
+
+If we are given a support threshold  $s$, then we say an itemset is  $maximal$  if no superset is frequent. If we list only the maximal itemsets, then we know that all subsets of a maximal itemset are frequent, and no set that is not a subset of some maximal itemset can be frequent.
+
+
+
+#### 6.2.4 Tyranny of Counting Pairs
+
+In practice the __support threshold is set high enough__ that it is only a rare set that is frequent.
+
+
+
+#### 6.2.5 The A-Priori Algorithm
+

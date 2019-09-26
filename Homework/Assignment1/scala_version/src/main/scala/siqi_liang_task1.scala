@@ -1,6 +1,6 @@
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
-import play.api.libs.json._
+import net.liftweb.json._
 
 case class UserInfo(
 		user_id: String,
@@ -30,13 +30,13 @@ case class UserInfo(
 
 object siqi_liang_task1 {
 
-	// implicit val formats = DefaultFormats
+	implicit val formats = DefaultFormats
 
-    // def json_parse(jsonObj: String) : UserInfo = {
-    // 	val jValue = parse(jsonObj)
-    // 	val user = jValue.extract[UserInfo]
-    // 	return user
-    // }
+    def json_parse(jsonObj: String) : UserInfo = {
+    	val jValue = parse(jsonObj)
+    	val user = jValue.extract[UserInfo]
+    	return user
+    }
 
 
 	def main(args: Array[String]) {
@@ -50,8 +50,8 @@ object siqi_liang_task1 {
 
         val sc = new SparkContext()
 		val userRDD = sc.textFile(path + userFile)
-		val userRDDjson = userRDD.map(x => Json.parse(x))
-		println(userRDD.take(1).JsValue)
+		val userRDDjson = userRDD.map(x => json_parse(x))
+		println(userRDD.take(1))
 
 	}
 }
