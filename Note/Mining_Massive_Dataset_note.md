@@ -315,3 +315,7 @@ Then we look at the Multistage Algorithm, which uses the PCY trick and also inse
 
 #### 6.3.1 The Algorithm of Park, Chen and Yu
 
+#### 6.3.2 The Multistage Algorithm
+
+
+

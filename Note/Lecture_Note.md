@@ -1052,7 +1052,42 @@ In PCY algorithm, when generating  $L_1$, the set of frequent itemsets of size 1
 
 
 
-### Multi-Stage Algorithm
+### Multistage Algorithm
+
+Multistage Algorithm is an improvement on PCY, which actually uses more than two passes to find frequent pairs. We will concentrate on the three pass version. The benefit of the extra pass is that on the final pass when we have to count the candidate pairs, we've eliminated many of the candidates that PCY woud count but that turn out not to be frequent. 
+
+- __Key Idea:__ After Pass 1 of PCY, rehash only those pairs that qualify for Pass 2 of PCY.
+- On Pass 2, fewer pairs contribute to buckets, so fewer _false positive_ (frequent buckets with no frequent pair):
+  - $i$  and  $j$  are frequent
+  - $\{i,j\}$  hashes to a frequent bucket from Pass 1
+- Requires 3 passes over the data, and also keep a bitmap from Pass 2, count pairs  $\{i,j\}$  if and only if:
+  - $i,j$  are frequent
+  - $\{i,j\}$  hashes to frequent bucket in B1 (labeled as __1__ in bitmap 1)
+  - $\{i,j\}$  hashes to frequent bucket in B2 (labeled as __1__ in bitmap 2)
+
+
+
+__Important Points:__
+
+1. The two hash functions have to be independent
+2. we need to check both hashes on the third pass:
+   - If not, we would end up counting pairs of frequent items that hashed first to an infrequent bucket but happened to hash second to a frequent bucket
+   - would be a false positive
+
+
+
+__Key Observation:__
+
+- Can insert any number of hash passes between first and last stage
+  - Each one uses an independent hash function
+  - Eventually, all memory would be consumed by bitmaps, no memory left for counts
+  - Cost is another pass of reading the input data
+- the truly frequent pairs will always hash to a frequent bucket
+- we will count the frequent pairs no matter how many hash functions we use
+
+
+
+### Multihash Algorithm
 
 
 
