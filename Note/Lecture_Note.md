@@ -1028,3 +1028,31 @@ __Why can't we use a triangular matrix on phase 2 of PCY?__
   - No known way of compacting matrix to avoid leaving space for uncounted pairs
 - Must use triples method  __(item, item, count)__
 
+
+
+#### Hashing
+
+In PCY algorithm, when generating  $L_1$, the set of frequent itemsets of size 1, the algorithm also:
+
+- generates all possible pairs for each basket
+- hashes them to buckets
+- keeps a count for each hash bucket
+- Identifies frequent buckets ( $count \ge s$)
+
+
+
+#### Reducing number of candidate pairs
+
+- __Goal:__ reduce the size of candidate set  $C_2$
+  - Only have to count candidate pairs
+  - Pairs that hash to a frequent bucket
+- Essential that the hash table is large enough so that collisions are few
+- Collisions result in loss of effectiveness of the hash table
+- Must count all those pairs to determine which are truly frequent.
+
+
+
+### Multi-Stage Algorithm
+
+
+
