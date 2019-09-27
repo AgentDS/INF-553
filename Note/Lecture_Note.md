@@ -1218,3 +1218,60 @@ __Algorithm Pass 2:__
 
 ### Toivonen's Algorithm
 
+- Given sufficient main memory, uses **one pass over a small sample** and **one full pass over data**
+- **Gives no false positives or false negatives**
+- BUT, there is a **small but finite probability it will fail to produce an answer**
+  - Will not identify frequent itemsets
+- Then **must be repeated** with a different sample until it gives an answer
+- Need only a small number of iterations.
+
+
+
+__Pass 1:__ **First find candidate frequent itemsets from sample**
+
+- Start as in the random sampling algorithm, but lower the threshold slightly for the sample to <u>find candidate frequent itemsets from sample:</u>
+
+  - Example: if the sample is  $1\%$  of the baskets, use  $s/125$  as the support threshold rather than  $s/100$
+  - For fraction  $p$  of baskets in sample, use  $0.8ps$  or  $0.9ps$  as support threshold
+
+  - Goal is to avoid missing any itemset that is frequent in the full set of baskets
+
+- After finding frequent itemsets for the sample, <u>construct the **negative border**</u>
+
+  **Negative border:** Collection of itemsets that are **not frequent** in the sample but **all of their immediate subsets are frequent**
+
+  - Immediate subset is constructed by deleting exactly one item
+
+
+
+__Pass 2: Process the whole file (no sampling!)__
+
+- Count all **candidate frequent itemsets** from first pass
+- Count all **itemsets on the negative border**
+- **Case 1: No itemset from the negative border turns out to be frequent in the whole data set**
+  - Correct set of frequent itemsets is **exactly** the itemsets from the sample that were found frequent in the whole data
+- **Case 2: Some member of negative border is frequent in the whole data set**
+  - Can give no answer at this time
+  - **Must repeat algorithm with new random sample.**
+
+
+
+If some **member of the negative border is frequent** in the whole data set, can’t be sure that there are not some even larger itemsets that:
+
+- Are **neither in the negative border nor in the collection of frequent itemsets for the sample**
+- **But are frequent in the whole**
+
+**So start over with a new sample**
+
+Try to **choose the support threshold** so that **probability of failure is low,** while **number of itemsets checked on the second pass fits in main-memory.**
+
+
+
+
+
+
+
+
+
+
+
