@@ -1089,5 +1089,132 @@ __Key Observation:__
 
 ### Multihash Algorithm
 
+- __Key idea:__ Use several independent hash tables on the first pass
+- **Risk:** Halving the number of buckets doubles the average count
+  - We have to be sure most buckets will still not reach count  $s$
+- If so, we can get a benefit like multistage, but in only 2 passes
 
+
+
+The conditions for a pair $\{i,j\}$  to be in  $C_2$, and thus to require a count on the second pass:
+
+- $i$  and  $j$  must both be frequent
+- the pair must have hashed to a frequent bucket according to both hash tables
+
+
+
+### PCY: Extensions
+
+- Either **multistage** or **multihash** can use more than two hash functions
+- In **multistage**, there is a point of diminishing returns, since the bit-vectors eventually consume all of main memory
+- For **multihash**, the bit-vectors occupy exactly what one PCY bitmap does, but too many hash functions makes all  $counts > s$.
+
+
+
+### Limited Pass Algorithms
+
+- Algorithms so far: compute **exact** collection of frequent itemsets of size k in k passes
+  - A-Priori, PCY, Multistage, Multihash
+- Many applications where it is not essential to discover **every** frequent itemset
+  - Sufficient to discover **most of them**
+- Next: algorithms that find all or most frequent itemsets using at most 2 passes over data
+  - Sampling
+  - SON
+  - Toivonen’s Algorithm
+
+
+
+### Random Sampling of Input Data
+
+- Take a **random sample** of the market baskets **that fits in main memory**
+  - Leave enough space in memory for counts
+- Run a-priori or one of its improvements in main memory
+  - **For sets of all sizes**, not just pairs
+  - Don’t pay for disk I/O each time we increase the size of itemsets
+  - Reduce support threshold proportionally to match the sample size.
+- Use support threshold a suitable, scaled-back number
+  - Example: if your sample is  $1/100$  of the baskets, use  $s/100$  as your support threshold of  $s$
+
+
+
+__Random Sampling is Not an exact algorithm:__
+
+- With a single pass, **cannot guarantee:**
+  - That algorithm will **produce all itemsets** that are frequent in the whole dataset
+    - **False negative:** itemset that is frequent in the whole but not in the sample
+  - That it will **produce only itemsets** that are frequent in the whole dataset
+    - **False positive:** frequent in the sample but not in the whole
+- If the sample is large enough, there are unlikely to be serious errors.
+
+
+
+<u>Smaller threshold helps catch more truly frequent itemsets</u>
+
+
+
+### Savasere-Omiecinski-Navathe (SON) Algorithm
+
+- Avoids false negatives and false positives
+- Requires two full passes over data.
+
+
+
+__Algorithm Pass 1:__
+
+1. Repeatedly read small subsets of the baskets into main memory
+2. Run an in-memory algorithm (e.g., a priori, random sampling) on each subset to find all frequent itemsets
+3. An itemset becomes a candidate if it is found to be frequent in **any** one or more subsets of the baskets
+
+
+
+__Algorithm Pass 2:__
+
+- On a second pass, count all the candidate itemsets and determine which are frequent in the entire set
+- **Key** “**monotonicity**” **idea**: an itemset cannot be frequent in the entire set of baskets unless it is frequent in at least one subset
+  - Subset or chunk contains fraction p of whole file
+  - 1/p chunks in file
+  - If itemset is not frequent in any chunk, then **support in each chunk is less than ps**
+  - **Support in whole file is less than s: not frequent.**
+
+
+
+#### SON - Distributed Version
+
+- SON lends itself to distributed data mining
+  - MapReduce
+- Baskets distributed among many nodes
+  - Subsets of the data may correspond to one or more chunks in distributed file system
+  - Compute frequent itemsets at each node
+  - Distribute candidates to all nodes
+  - **Accumulate the counts of all candidates.**
+
+
+
+- __Phase 1:__ Find candidate itemsets
+  - __Map:__
+    - Input is a chunk/subset of all baskets; fraction  $p$  of total input file
+    - **Find itemsets frequent in that subset**(e.g.,using random sampling algorithm)
+    - Use support threshold  $ps$
+    - **Output is set of key-value pairs (F,1) where F is a frequent itemset from sample**
+  - __Reduce:__
+    - Each reduce task is assigned set of keys, which are itemsets
+    - **Produces keys that appear one or more time**
+    - **Frequent in some subset**
+    - **These are candidate itemsets**
+- __Phase 2:__ Find true frequent itemsets
+  - __Map:__
+    - **Each Map task takes output from first Reduce task AND a chunk of the total input data file**
+    - **All candidate itemsets go to every Map task**
+    - **Count occurrences** of each candidate itemset among the baskets in the input chunk
+    - **Output is set of key-value pairs (C,v), where C is a candidate frequent itemset and v is the support for that itemset** among the baskets in the input chunk
+  - __Reduce:__
+    - **Each reduce task is assigned a set of keys (itemsets)**
+    - Sums associated values for each key: total support for itemset
+    - **If support of itemset>=s, emit itemset and its count**
+
+
+
+
+
+### Toivonen's Algorithm
 
