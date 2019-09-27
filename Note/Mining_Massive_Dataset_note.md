@@ -269,3 +269,49 @@ In practice the __support threshold is set high enough__ that it is only a rare 
 
 #### 6.2.5 The A-Priori Algorithm
 
+The  $A$-$Priori$ Algorithm is designed to reduce the number of pairs that must be counted, at the expense of performing two passes over data, rather than one pass.
+
+
+
+##### The First Pass of A-Priori
+
+1. Create a table that translates item names into integers from  $1$  to  $n$; then create another table as an array of counts: the $i$th array element counts the occurrences of the item numbered  $i$. The counts for all the items are 0
+2. As we read baskets, we look at each item in the basket and translate its name into an integer. Next, we use that integer to index into the array of counts, and we add 1 to the integer found there.
+
+##### Between the Passes of A-Priori
+
+1. Examine the counts of the items to determine which of them are frequent as singletons. A typical  $s$  would be  $1\%$  of the baskets.
+2. For the second pass of A-Priori, create a new numbering from  $1$  to  $m$  for just the frequent items.
+
+##### The Second Pass of A-Priori
+
+The space required on the second pass is  $2m^2$  bytes, rather than  $2n^2$  bytes, if we use the triangular- matrix method for counting. 
+
+1. For each basket, look in the frequent-items table to see which of its items are frequent.
+2. In a double loop, generate all pairs of frequent items in that basket.
+3. For each such pair, add one to its count in the data structure used to store counts.
+4. at the end of the second pass, examine the structure of counts to determine which pairs are frequent.
+
+
+
+#### 6.2.6 A-Priori for All Frequent Itemsets
+
+The pattern of moving from one size  $k$  to the next size  $k + 1$  can be summarized as follows. For each size  $k$, there are two sets of itemsets:
+
+1. $C_k$  is the set of $candidate$ itemsets of size  $k$  --  the itemsets that we must count in order to determine whether they are in fact frequent.
+2. $L_k$  is the set of truly frequent itemsets of size  $k$.
+3. Define  $C_k$ to be all those itemsets of size  $k$, every  $k − 1$  of which is an itemset in  $L_{k−1}$.
+4. Find  $L_k$  by making a pass through the baskets and counting all and only the itemsets of size  $k$  that are in  $C_k$. Those itemsets that have count at least  $s$  are in  $L_k$.
+
+
+
+### 6.3 Handling Larger Datasets in Main Memory
+
+Several algorithms have been proposed to cut down on the size of candidate set  $C_2$. Here, we consider the PCY Algorithm, which takes advantage of the fact that in the first pass of A-Priori there is typically lots of main memory not needed for the counting of single items.
+
+Then we look at the Multistage Algorithm, which uses the PCY trick and also inserts extra passes to further reduce the size of  $C_2$.
+
+
+
+#### 6.3.1 The Algorithm of Park, Chen and Yu
+

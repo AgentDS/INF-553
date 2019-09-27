@@ -663,7 +663,7 @@ Reduce(key,values):
 
 
 
-## Week3 - Finding Frequent Itemsets
+## Week3 - Finding Frequent Itemsets 1
 
 __Frequent Itemsets and Association Rules:__ Family of techniques for characterizing data: discovery of frequent itemsets
 
@@ -959,4 +959,72 @@ __A-Priori for All Frequent Itemsets:__
 - $C_{k+1}$ = $(k+1)$-sets, each $k$ of which is in $L_k$
 
 
+
+## Week4 - Frequent Itemsets 2-3
+
+### Park-Chen-Yu (PCY) Algorithm
+
+-  During Pass 1 of A-priori, most memory is idle
+
+
+
+#### Pass 1
+
+1. Use that memory to keep counts of buckets into which pairs of items are hashed
+   - Just the count, not the pairs themselves 
+
+2. For each basket, enumerate all its pairs, hash them, and increment the resulting bucket count by 1
+
+   - Pairs of items need to be generated from the input file; they are not present in the file
+
+   ```
+   FOR (each basket) :
+       FOR (each item in the basket) :
+           add 1 to item’s count;
+       FOR (each pair of items) :
+           hash the pair to a bucket;
+           add 1 to the count for that bucket;
+   ```
+
+3. A bucket is __frequent__ if its count is at least the support threshold;
+
+   If a bucket is not frequent, no pair that hashes to that bucket could possibly be a frequent pair
+
+<u>Pass 1 eliminates lots of unfrequent pairs, which enables Pass2 of PCY to operate in main memory rather than on disk.</u>
+
+
+
+#### Between Passes
+
+1. Replace the buckets by a bit-vector (__bitmap__)
+   - **1** means the bucket count exceeded the support  $s$ (call it a **frequent bucket**); **0** means it did not
+2. 4-byte integer counts are replaced by bits, so the bit-vector requires  $1/32$ of memory
+3. Decide which items are frequent and list them for the second pass
+
+
+
+#### Pass 2
+
+1. Count all pairs  $\{i,j\}$  that meet both conditions below for being a __candidate pair__:
+   - Both  $i$  and  $j$  are frequent items
+   - The pair   $\{i,j\}$, hashes to a bucket number whose bit in the bit-vector is 1
+
+> __Memory Details__
+>
+> - Buckets require a few bytes each
+>   - no need to count past  $s$
+>   - \#buckets is  $O(\text{main-memory size})$
+> - On second pass, a table of (item, item, count) triple is essential
+>   - Thus, hash table must eliminate  $2/3$  of the candidate pairs for PCY to beat A-Priori
+
+
+
+__Why can't we use a triangular matrix on phase 2 of PCY?__
+
+- in A-Priori, the frequent items could be renumbered in Pass 2 from  $1$  to  $m$
+- Can’t do that for PCY
+- Pairs of frequent items that PCY lets us avoid counting are placed randomly within the triangular matrix
+  - Pairs that happen to hash to an infrequent bucket on first pass
+  - No known way of compacting matrix to avoid leaving space for uncounted pairs
+- Must use triples method  __(item, item, count)__
 
