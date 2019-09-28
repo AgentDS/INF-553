@@ -971,8 +971,9 @@ __A-Priori for All Frequent Itemsets:__
 #### Pass 1
 
 1. Use that memory to keep counts of buckets into which pairs of items are hashed
-   - Just the count, not the pairs themselves 
-
+   
+- Just the count, not the pairs themselves 
+   
 2. For each basket, enumerate all its pairs, hash them, and increment the resulting bucket count by 1
 
    - Pairs of items need to be generated from the input file; they are not present in the file
@@ -1263,7 +1264,7 @@ If some **member of the negative border is frequent** in the whole data set, can
 
 **So start over with a new sample**
 
-Try to **choose the support threshold** so that **probability of failure is low,** while **number of itemsets checked on the second pass fits in main-memory.**
+Try to **choose the support threshold** so that **probability of failure is low**, while **number of itemsets checked on the second pass fits in main-memory**.
 
 
 
