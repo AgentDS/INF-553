@@ -1,4 +1,4 @@
-# niINF-553 Foundations and Applications of Data Mining 2019 Fall
+# INF-553 Foundations and Applications of Data Mining 2019 Fall
 by Dr. Anna Farzindar  
 
 [TOC]
@@ -971,9 +971,9 @@ __A-Priori for All Frequent Itemsets:__
 #### Pass 1
 
 1. Use that memory to keep counts of buckets into which pairs of items are hashed
-   
+  
 - Just the count, not the pairs themselves 
-   
+  
 2. For each basket, enumerate all its pairs, hash them, and increment the resulting bucket count by 1
 
    - Pairs of items need to be generated from the input file; they are not present in the file
@@ -1194,7 +1194,7 @@ __Algorithm Pass 2:__
 - __Phase 1:__ Find candidate itemsets
   - __Map:__
     - Input is a chunk/subset of all baskets; fraction  $p$  of total input file
-    - **Find itemsets frequent in that subset**(e.g.,using random sampling algorithm)
+    - **Find itemsets frequent in that subset** (e.g.,using random sampling algorithm)
     - Use support threshold  $ps$
     - **Output is set of key-value pairs (F,1) where F is a frequent itemset from sample**
   - __Reduce:__
@@ -1268,11 +1268,493 @@ Try to **choose the support threshold** so that **probability of failure is low*
 
 
 
+## Week5 - Finding Similar Sets Part 1-2
+
+### Applications
+
+Many problems can be expressed as finding “similar” sets: <u>Find near-neighbors in high-dimensional space.</u>
+
+- Pages with similar words
+  - For duplicate detection, classification by topic
+- Movie Rating, NetFlix users with similar tastes in movies
+  - For recommendation systems
+- Customers who purchased similar products
+  - Products with similar customer sets
+- Images with similar features
+  - Users who visited similar websites
+
+
+
+#### Problems
+
+- Given: High dimensional data points $x_1, x_2, \ldots$
+- some distance function  $d(x_1, x_2)$
+- Goal: find all pairs of data points  $(x_i, x_j)$  that are within some distance threshold  $d(x_i, x_j) \le s$
+- Note: Naive solution would take  $O(N^2)$, where $N$ is the number of data points
 
 
 
 
 
+#### Finding Similar Items
+
+##### Finding Similar Documents
+
+- __Goal:__ Given a body of **documents**, e.g., the Web, find **pairs of documents** with a lot of **text in common**, such as:
+  - **Mirror sites**, or approximate mirrors
+    - Don’t want to show both in a search
+  - **Plagiarism**, including large quotations
+  - **Similar news articles** at many news sites
+    - Cluster articles by “same story.”
+- __Problems:__
+  - Many **small pieces** of one document can appear out of order in another
+  - **Too many** documents **to compare** all pairs
+  - Documents are so large or so many that they **cannot fit in main memory.**
+
+
+
+
+
+##### Distance Measures
+
+- Goal: Finding near-neighbors in high-dimensional space
+- For each application, we first need to define what “**distance**” means
+- __Jaccard distance/similarity__
+
+
+
+__Jaccard similarity of Sets:__ Given two sets  $C_1$ and  $C_2$, Jaccard similarity is  
+$$
+\text{Sim}(C_1, C_2) = \frac{C_1 \cap C_2}{|C_1 \cup C_2|}.
+$$
+__Jaccard distance of Sets:__ Given two sets  $C_1$ and  $C_2$, Jaccard distance is  $1 - \text{Sim}(C_1, C_2)$.
+
+
+
+
+
+__Why we don't use A-Priori to find the most frequent pairs?__
+
+- Pairs with low support might be filtered out already, even though there might be similarity
+
+
+
+##### Application: Collaborative Filtering
+
+- Recommend movies
+  - Recommend similar movies
+  - Movies from similar users
+- User = a set of movies he/she has watched
+- Movie = a set of users who has watched it
+
+
+
+
+
+__3  Essential Steps for Finding Similar Docs:__
+
+1. ***Shingling:*** Convert documents **to sets**
+2. ***Min-Hashing:*** Convert large sets to short **signatures**, while **preserving similarity**
+3. ***Locality-Sensitive Hashing:*** Focus on **pairs of signatures** likely to be from **similar documents**
+   - Candidate pairs
+
+<img src="./pic/bigpicture.png" height="200px">
+
+
+
+### Shingling
+
+Convert documents to sets. The document is a set of words, as well as the order of words!!!
+
+
+
+A *k*-shingle (or *k*-gram) for a document is a sequence of *k* tokens that appears in the doc:
+
+- Tokens can be characters, words or something else, depending on the application
+- Assume tokens = characters for examples
+
+__Example:__  $k=2$; Document  $D_1 = abcab$
+
+Set of 2-shingles: $S(D_1) = \{ab, bc, ca\}$.
+
+<u>Represent a doc by its set of $k$-shingles.</u>
+
+Max # of k-shingles for a page of n characters? $N-k+1$.
+
+
+
+##### White Spaces
+
+- Better not omit them
+-  Could turn multiple into one
+
+
+
+##### Shingle Size
+
+- Too small: Many documents will falsely become similar
+- Too big: Might miss truly similar documents
+
+
+
+#### Working Assumption
+
+- Documents that have lots of shingles in common have similar text, even if the text appears in different order
+- **Caveat:** You must pick ***k*** **large enough**, or most documents will have most shingles
+  - $k=5$  is ok for short documents (eg. Email, Tweet)
+  - $k=8$  is better for long documents
+- May want to **compress long shingles**
+
+
+
+#### Compressing Shingles
+
+- To **compress long shingles**, we can **hash** them to (say) 4 bytes
+  - Called __tokens__
+- **Represent a document by the set of hash values of its** ***k*****-shingles**
+  - Two documents could (rarely) appear to have shingles in common, when in fact only the hash-values were shared
+
+
+
+__Why is compression is needed?__
+
+- How many k-shingles?
+  - imagine **20 characters** in alphabet
+  - Estimate of number of k-shingles is  $20^k$
+  - 4-shingles: $20^4$  or  $160,000$  or  $2^{17.3}$
+  - 9-shingles: $20^9$  or  $512,000,000,000$  or  $2^{39}$
+- Assume we use **4 bytes** to represent a **bucket**
+- Buckets numbered in range  $0$  to  $2^{32} – 1$
+- Much smaller than possible number of **9-shingles** and represent each shingle with 4 bytes, not 9 bytes
+  - Compression
+
+
+
+__Why hash 9-shingles to 4 bytes rather than use 4-shingles?__
+
+- With 4-shingles, most sequences of four bytes are unlikely or impossible to find in typical documents
+- Effective number of different shingles much less than $2^{32} – 1$
+- With 9-shingles, $2^{39}$  possible shingles
+  - Many more than  $2^{32}$  buckets
+- After hashing, may get any sequence of 4 bytes
+
+
+
+#### Similarity Metric for Shingles
+
+- Document $D_1$  is a set of its k-shingles  $C_1=S(D_1)$
+- Equivalently, each document is a vector of 0s,1s in the space of *k*-shingles
+  - Each unique shingle is a dimension
+  - Vectors are very sparse
+- **A natural similarity measure is the** **Jaccard similarity.**
+
+
+
+### Minhashing
+
+#### Motivation for Minhash/LSH
+
+**Use k-shingles to create Signatures:** short integer vectors that represent sets and reflect their similarity
+
+- Suppose we need to find near-duplicate documents among million documents
+- Naïvely, we would have to compute **pairwise Jaccard similarities** for **every pair of docs**
+  - $N = 1\text{ million}$,  $N(N-1)/2 \approx 5 \times 10^{11}$ comparisons
+
+
+
+#### From Sets to Boolean Matrices
+
+- __Rows__ = elements of the universal set
+  - Example: the set of all k-shingles
+- __Columns__ = sets
+  - 1 in **row**  $e$  and **column**  $S$ if and only if element  $e$  is a member of set  $S$
+  - Column similarity is the Jaccard similarity of the sets of their rows with 1: intersction/union of sets
+- **Typical matrix is sparse** (many 0 values)
+- May not really represent the data by a boolean matrix
+- Sparse matrices are usually better represented by the list of non-zero values
+
+
+
+**When Is Similarity Interesting?**
+
+1. When the **sets are so large** or so many that they **cannot fit** in main **memory**
+2. when there are **so many sets** that **comparing all pairs** of sets takes **too much time**
+3. or both
+
+
+
+#### Outline: Finding Similar Columns
+
+1. Compute **signatures** of columns = **small summaries** of columns
+2. Examine **pairs of signatures** to find similar signatures
+   - **Essential:** **similarities of signatures** and **columns** are related
+3. **Optional:** check that columns with similar signatures are really similar.
+
+
+
+__Warning:__
+
+1. Comparing **all pairs of signatures** may take **too much time**, even if not too much space
+   - A job for __Locality-Sensitive Hashing__
+2. These methods can produce false negatives, and even false positives (if the optional check is not made).
+
+
+
+__Signatures:__ hash each column C to a small signature  $Sig(C)$, such that
+
+1. $Sig(C)$  is **small** enough that we can fit a signature in **main memory** for each column
+2. $Sim(C_1,C_2)$  is the same as the “**similarity**” of $Sig (C_1)$  and  $Sig (C_2)$.
+
+
+
+#### Minhashing
+
+1. To ***minhash*** a set represented by a column of the matrix, **pick a random permutation of the rows**
+2. **Define**“**hash**”**function  $h(C)$ =the number of the first (in the permuted order) row in which column** ***C*** **has 1**
+3. Useseveral(e.g.,100) independent hash functions to **create a signature**.
+
+
+
+#### Surprising Property: Connection between Minhashing and Jaccard Similarity
+
+- The probability that minhash function for a **random permutation of rows** produces same value for two sets equals**Jaccard similarity** of those sets
+  - **Probability that**  $h(C_1) = h(C_2)$  is the same as  $Sim(C_1, C_2)$
+- $Sim(C_1, C_2)$  for both Jacquard and Minhash are  $a/(a+b+c)$ !
+
+
+
+#### Similarity of Signatures
+
+- **Sets represented** by characteristic **matrix M**
+- **To represent sets:** pick at random some number **n of permutations** of the rows of M
+- Call **minhash** functions determined by these permutations  $h_1, h_2, \ldots, h_n$
+- From **column representing set S**, construct **minhash signature for S**:
+  - vector  $[h_1(S), h_2(S), \ldots, h_n(S)]$,  usually represented as column
+- **The** ***similarity of signatures*** **is the fraction of the hash functions in which they agree.**
+  - the longer the signatures, the smaller will be the expected error
+
+
+
+#### Implementation 
+
+- **Not feasible to permute** a large characteristic matrix explicitly
+- Can simulate the effect of a random permutation by a __random hash function__
+  - **Maps row** numbers to as many buckets as there are rows
+  - May have **collisions on buckets**
+  - **Not important as long as number of buckets is large**
+
+
+
+```python
+for each row r do begin
+   for each hash function hi do
+      Compute hi (r ) 
+   for each column c
+      if c has 1 in row r
+         for each hash function hi do
+            if hi (r ) is a smaller value than M (i, c ) then
+               M (i, c ) := hi (r );
+```
+
+- Often, data is given by column, not row.
+  - columns = documents, rows = shingles.
+- If so, sort matrix once so it is by row.
+- And *always* compute  $h_i(r)$  only once for each row.
+
+
+
+### Locality-Sensitive Hashing
+
+
+
+
+
+## Week6 - Finding Similar Sets Part 3
+
+This lecture will talk about Local-Sensitive Hashing (LSH), which focus on **pairs of signatures** likely to be from similar documents.
+
+### Motivation for LSH
+
+After using k-shingles and Minhashing, we have to compute __pairwise Jaccard similarities__ for every pair of signatures, which could be a lot of computation. We need to reduce computation intensity!!
+
+
+
+### LSH overview
+
+- Hash items several times
+  - In a way that **similar items** are more likely to **be hashed to the same bucket** than dissimilar items
+- **Candidate Pair:** Any pair that hashes to the same bucket for **any** of the hashings
+- **Check only the candidate pairs for similiarity**
+- **False positives** **:** **dissimilar pairs** that hash to the same bucket
+- **False negatives:** **truly similar** pairs do **not** hash to the same bucket for at least one of the hash functions.
+
+
+
+### LSH
+
+- __Goal:__ **Find documents with Jaccard similarity at least** ***s*** for some similarity threshold ***s*** (e.g. ***s***=0.8)
+- **LSH –** **General idea:** Use a function ***f(x,y)*** that tells whether***x*** and ***y*** are a ***candidate pair****:* a pair of elements whose similarity must be evaluated
+- For Min-Hash Matrix:
+  - Hash columns of signature matrix ***M*** to many buckets
+  - Each pair of documents that hashes into the same bucket is a **candidate pair.**
+
+- (We expect documents ***x*** and ***y*** to have the same **(Jaccard) similarity as their signatures.**)
+
+
+
+__LSH for Min-Hashing:__
+
+- __Big idea:__ **Hash columns of signature matrix** ***M*** **several times**
+- Arrange that (only) **similar columns** are likely to **hash to the same bucket**, with high probability
+- **Candidate pairs are those that hash to the same bucket.**
+- Detiled steps:
+  - Divide matrix ***M*** into ***b*** bands of ***r*** rows
+  - For each band, hash its portion of each column to a hash table with ***k*** buckets
+    - Make ***k*** as large as possible
+    - Use a **separate bucket array for each band** so columns with the same vector in **different bands don’t hash to same bucket**
+  - ***Candidate*** **column pairs** are those that **hash to the same bucket for** ≥ **1 band**
+  - Tune ***b*** and ***r*** to catch most similar pairs, but few non-similar pairs.
+
+
+
+#### LSH involves a tradeoff
+
+- Pick:
+
+  - The number of Min-Hashes (rows of ***M***)
+  - The number of bands ***b***
+  - The number of rows ***r*** per band
+
+  to balance false positives/negatives
+
+- **Example:** If we had only 15 bands of 5 rows, the number of **false positives would go down**, but the number of **false negatives would go up**.
+
+Form of an S-curve, regardless of values of  $b$  and  $r$, threshold s is where rise of curve is steepest: approximately  $(1/b)^{1/r}$.
+
+__Example:__
+
+- $(1/b)^{1/r}$ **represents the threshold of the S curve for function**
+- $1 - (1 - t^r)^b$, the probability of being a candidate pair
+- **To avoid false negatives**:  Select $b$ and  $r$  to produce a threshold lower than  $s$
+- **To avoid false positive**:  Select $b$  and  $r$  to produce a threshold higher than  $s$
+
+
+
+#### LSH Summary
+
+- Tune ***M, b, r*** to identify **almost all candidate pairs with similar signatures**, but **eliminate most pairs that do not have similar signatures**
+- Then **check in main memory that candidate pairs really do have** **similar signatures**
+- **Optional:** In another pass through data, check that**the remaining candidate pairs really** **represent similar documents.**
+
+
+
+### Family of Functions for LSH
+
+- **Families of functions** (including minhash functions) that can serve to **produce candidate pairs efficiently**
+  - Space of sets and Jaccard distance OR other space and/or distance measure
+- **Three conditions for family of functions:**
+  1. **More likely to make close pairs be candidate pairs than distant pairs**
+  2. **Statistically independent**
+  3. **Efficient** in two ways
+     - **Be able to identify candidate pairs in time much less than time to look at all pairs**
+     - **Combinable to build functions better at avoiding false positives and negatives** 
+
+
+
+#### LSH for other distance measures
+
+- We focused on **minhashing**, a locality sensitive hashing family that uses **Jaccard distance**
+  - Based on sets representing documents and their Jaccard similarity
+- LSH families for **other distance measures**:
+  - **Euclidean distance:** based on the locations of points in a __Euclidean space__ with some number of real-valued dimensions
+  - **Cosine distance:** **angle between vectors** from the origin to the points in question
+  - **Edit distance:** **number of inserts and deletes** to change one string into another
+  - **Hamming Distance:** **number of positions** in which bit vectors differ
+
+
+
+### LSH and Shingling Application Examples
+
+#### Matching fingerprints
+
+__Representation of fingerprint:__
+
+- Typical representation is not an image, but **set of locations in which minutiae are located**
+  - **Place where something unusual happens**: two ridges merging or a ridge ending
+- Place a grid over a fingerprint
+  - Normalize for **size and orientation** so that identical prints will overlap
+- Represent fingerprint by **set of grid points** where**minutiae are located**
+  - Possibly, **treat minutiae near a grid boundary** as if also present in adjacent grid points
+
+
+
+__Applying LSH to Fingerprints:__
+
+- **Make a bit vector for each fingerprint’s set of grid points with minutiae**
+
+  - Similar to set representing a document: 1 if the shingle is in the document, 0 otherwise
+
+- minhash the bit vectors to obtain signatures:
+
+  - But since there probably aren’t too many grid points, we can work from the bit-vectors directly
+
+- **Many-to-many version of fingerprint matching:** take an entire database of fingerprints and identify if there are **any pairs** that represent the **same individual**
+
+  - **Analogous to finding similar documents among millions of documents**
+
+  - **Define a locality-sensitive family of hash functions:**
+    - Each function f in the family F is defined by **3 grid squares**
+    - Function f says “yes” for two fingerprints if both have minutiae in all **three grid squares, otherwise, f says “no”**
+    - “Yes” means the two fingerprints are candidate pairs
+    - Sort of “bucketization”:
+      - Each set of **three points creates one bucket**
+      - Function f sends fingerprints to its bucket that have minutae in all three grid points of f
+  - Compare all fingerprints in each of the buckets.
+
+- __Many-to-one version:__ A fingerprint has been found at a crime scene, and we want to **compare it with all fingerprints in a large database to see if there is a match**
+
+  - Could use many functions f from family F
+  - **Precompute their buckets of fingerprints to which they answer “yes” on the large database**
+  - For a new fingerprint:
+    - Determine which buckets it belongs to
+    - Compare it with all fingerprints found in any of those buckets
+
+
+
+
+
+#### Identifying similar news articles
+
+- **Want to organize large repository of on-line news articles**
+  - **Group together web pages derived from same basic text**
+- **Scenario:** the same article, say from the Associated Press, appears on the Web site of many newspapers, but looks quite different
+- Each newspaper surrounds the text of the article with:
+  - Its own logo and text
+  - Ads
+  - Perhaps links to other articles
+- A newspaper may also "crop" the article (delete parts).
+
+
+
+__Variation on shingling:__
+
+- **Looks like earlier problem:** find documents whose shingles have high Jaccard similarity
+- **But: Shingling treats all parts of document equally**
+- For this application, **we want to ignore parts of the documents** (ads, links to other articles, etc.)
+- There is a difference between text that appears in prose and text in ads or headlines/links
+  - Prose contains greater frequency of ***stop words***
+  - Common to use list of several hundred most frequent words.
+- **News articles have a lot of stop words, while ads do not**
+- **Define a** ***shingle*** **to be a stop word plus the next two** **following words**
+- **Then compare the similarity of the sets of shingles that represent each document**
+  - Don’t use minhashing or LSH in this example
+
+
+
+__Why it Works?__
+
+- By requiring each shingle to have a stop word**:** **bias the mapping from documents to shingles** so it picked more shingles from the article than from the ads
+- **Pages with the same article, but different ads,**have **higher Jaccard similarity** than those with the same ads, but different articles
 
 
 

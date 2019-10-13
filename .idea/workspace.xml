@@ -2,7 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3048757c-7701-4810-8801-4ca61ec32eae" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Assignment1/scala_version/siqi_liang_hw1/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Assignment1/scala_version/siqi_liang_hw1/src/main/scala/com/siqi_liang_hw1/App.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Assignment1/scala_version/siqi_liang_hw1/src/test/scala/samples/junit.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Assignment1/scala_version/siqi_liang_hw1/src/test/scala/samples/scalatest.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Assignment1/scala_version/siqi_liang_hw1/src/test/scala/samples/specs.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Assignment1/scala_version/src/main/scala/siqi_liang_task1.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Assignment1/scala_version/src/main/scala/siqi_liang_task2.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Assignment1/scala_version/src/main/scala/siqi_liang_task3.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Assignment2/pysrc/.ipynb_checkpoints/task1-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Assignment2/pysrc/.ipynb_checkpoints/task1-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Assignment2/pysrc/task1.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Assignment2/pysrc/task1.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Note/Lecture_Note.md" beforeDir="false" afterPath="$PROJECT_DIR$/Note/Lecture_Note.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -53,7 +63,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
