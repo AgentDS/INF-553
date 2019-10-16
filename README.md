@@ -266,6 +266,12 @@ Now run Scala in the terminal:![scala](./Note/pic/scala.png)
 
 - HW2
 
+  - Task 1: use A-Priori & SON algorithm to find all possible frequent itemsets
+    - for ``small2.csv`` case 1 with ``support=4``, local test shows ``minPartition=3``, ``A_priori_short_basket()`` works better. Local test takes 7 seconds. 
+    - for ``small1.csv`` case 2 with ``support=9``, local test shows ``minPartition=2``, ``A_priori_long_basket()`` works better. Local test takes 8 seconds. 
+    - ``A_priori_long_basket()`` optimizes the process of generating itemset size  $k+1$  from itemset size  $k$
+  - Task 2: use ``A_priori_long_basket()``, local test shows ``minPartition=6`` works better. Local test takes around 202 seconds.
+
 - HW3
 
 - HW4
