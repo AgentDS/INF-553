@@ -53,13 +53,13 @@ def sort_into_file(reduce_result, tag, file=None):
 
 
 def candidate_count(baskets, candidate_itemsets):
-    itemsets_count = []
+    itemsets_count = Counter()
     baskets = list(baskets)
     for basket in baskets:
         for itemset in candidate_itemsets:
             if all([item in basket for item in itemset.split('_')]):
-                itemsets_count.append(itemset)
-    return Counter(itemsets_count).items()
+                itemsets_count.update([itemset])
+    return itemsets_count.items()
 
 
 def A_priori_long_basket(baskets, support, total_baskets_cnt):
