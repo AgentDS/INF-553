@@ -1758,3 +1758,443 @@ __Why it Works?__
 
 
 
+
+
+## Week7 - Recommendation System 1-2
+
+### Introduction and Background
+
+__Motivation: the long tail__
+
+- From scarcity to abundance:
+  - Shelf space is a scarce commodity for traditional retailers
+- Web enables near-zero-cost dissemination of information about products
+- More choice necessitates better filters
+
+
+
+__Types of Recommendations:__
+
+- Editorial and hand curated
+  - List of favorites
+  - Lists of "essential" items
+- Simple aggregates
+  - Top 10, Most Popular, Recent Uploads
+- Tailored to individual users
+  - Amazon, Netflix, ...
+
+
+
+### Formal Model
+
+- __X =__ set of Customers
+
+- __S =__ set of Items
+
+- Users have preferences for certain items
+- Want to extract preferences from data
+- __Utility function u: X $\times$ S $\to$ R__
+  - __R =__ set of ratings
+  - __R__ is a totally ordered set
+  - e.g., 0-5 stars, real number in $[0,1]$
+
+
+
+__Utility Matrix:__
+
+- For each user-item pair, value represents degree of preference that user for that item (e.g., rating)
+- Matrix is sparse (most entries unknown)
+
+
+
+__Key problems:__
+
+1. Gathering “known” ratings for matrix
+   - How to collect the data in the utility matrix
+2. Extrapolate unknown ratings from the known ones
+   - Mainly interested in **high unknown ratings**
+     - We are not interested in knowing what you don’t like but what you like
+     - To generate revenue
+3. Evaluating extrapolation methods
+   - How to measure success/performance of recommendation methods.
+
+
+
+
+
+#### Gathering Ratings
+
+- Explicit:
+  - Ask people to rate items
+  - Doesn’t work well in practice – people can’t be bothered
+- Implicit:
+  - Learning ratings from user actions
+    - purchase implies high rating
+
+
+
+#### Extrapolating Utilities
+
+- __Key problem:__ Utility matrix __U__ is __sparse__
+  - Most people have not rated most items
+  - __Cold start:__
+    - New items have no ratings
+    - New users have no history
+- Three approaches to recommender systems
+  - Content-based
+    - Use characteristics of an item
+    - Recommend items that have similar content to items user liked in the past
+    - items that match pre-defined attributes of the user
+  - Collaborative filtering
+    - Build a model from a user's past behavior (items previously purchased or rated) and similar decisions made by other users
+    - Use the model to predict items that the user may like
+    - Collaborative: suggestions made to a user utilize information across the entire user base
+  - Hybrid approaches
+
+
+
+### Content-based Recommendations
+
+- __Main idea:__ Recommend items to customer  $x$  that are similar to previous items rated highly by  $x$
+  - Requires characterizing the content of items in some way
+
+
+
+#### General Strategy for Content-Based Recommendations
+
+- Construct item profiles
+  - Explicit features in a database, discovering features in documents, Tags
+  - Create vectors representing items
+    - Boolean vectors indicate occurrence of high TF.IDF word
+    - Numerical vectors might contain ratings
+- Construct user profiles
+  - Create vectores with same components that describe user's preferences
+- Recommend items to users based on content
+  - Calculate cosine distance between item and user vectors
+  - Classification algorithms
+
+
+
+#### Item Profiles
+
+- For each item, create an **item profile**
+- **Profile is a set (vector) of features**
+  - **Movies:** screenwriter, title, actor, director,...
+  - **Text:** Set of “important” words in document
+
+
+
+##### Item Profiles Based on Textual Content
+
+-  Can treat this as an **Information Retrieval task (IR)**
+- Recommend items (web pages, books, movies) based on associated textual content
+
+
+
+__TF-IDF: Measure of Word Importance__
+
+- Classification of documents as being about similar things starts with finding significant words in those documents
+
+- Not most frequent words
+
+  - (The, and, a, ...) called "stop words"
+
+- Not just rare words either
+
+- Want concentration of useful words in just a few documents
+
+- Usual heuristic from text mining is **TF-IDF:**
+
+  $\text{term frequency} \times \text{inverse Doc frequency}$
+
+- Words with highest TF.IDF score are often the terms that best characterize the topic of a document
+
+- When constructing an item profile for Recommender system:
+
+  - Term ... Feature
+  - Document ... Item
+
+
+
+$f_{ij} = \text{frequency of term (feature) } i \text{ in ducument (item) } j$
+
+Term frequency: $TF_{ij} = \frac{f_{ij}}{\max_k{f_{kj}}}$
+
+- Term frequency of term  $i$  in document  $j$  is **normalized**
+- Divide by maximum occurrences of any term in document  $j$
+- Most frequent term has  $TF = 1$
+
+
+
+$n_i = \text{number of docs that mention term } i$
+
+$N=\text{ total number of docs}$
+
+Inverse Document Frequency: $IDF_i = \log_2{(N/n_i)}$
+
+TF-IDF score: $w_{ij} = TF_{ij} \times IDF_i$
+
+**Item profile for a document =** **set of words with highest TF-IDF scores, together with their scores.**
+
+ 
+
+
+
+#### Make recommendations based on Feature Documents
+
+- Want to suggest articles, pages, blogs a user might want to see
+- Hard to classify items by topic
+- In practice, **try to identify words that characterize the topic of a document**
+- **Eliminate stop words:** several hundred most common words
+- **For remaining words, calculate the TF.IDF score** for each word in the document
+- **The words with the highest TF.IDF scores characterize the document**
+
+
+
+1. Represent documents by a set of words
+   - **Take as features of the document** **the** ***n*** **words with highest TF.IDF scores**
+     - Could pick **same** ***n*** **for all documents**
+     - Or let ***n*** **be fixed percentage** of words in the document
+     - Could also make **all words with TF.IDF scores above a given threshold** are part of feature set
+   - Documents then represented by set of words
+   - <u>Expect these words to express subjects or main ideas of documents</u>
+   - Then can measure the similarity of two documents using:
+     - Cosine distance between the sets, treated as vectors
+     - Jaccard distance between sets of word
+
+
+
+__Cosine distance between 2 boolean vectors:__
+
+- **Vector has 1 if word is in the set** for that document and 0 if not
+
+- Between two documents, only a finite number of words among their two sets
+
+- Almost all components are 0; do not affect dot product
+
+- **Dot products** are size of **intersection of the two sets** of words
+
+- **Lengths of vectors** are square roots of number of words in each set
+
+- Cosine of angle between vectors: dot product divided by product of vector lengths:
+  $$
+  \text{similarity} = \cos(\theta) = \frac{A \cdot B}{\lVert A \rVert \cdot \lVert B \rVert}
+  $$
+
+
+
+**Another Option to Describe Item Content: Obtaining Item Profile Features from Tagging Systems:**
+
+- Useful for content-based recommendations for **images**
+- Users enter words or phrases that describe items
+- GPS information/geofilters: e.g., automatically add location information when a photo is uploaded
+- **Can use tags as a recommendation system**
+  - if user retrieves or bookmarks pages with certain tags, recommend other pages with same tags
+- Only works if users create tags or allow automatic geotagging.
+
+
+
+#### User Profiles
+
+__General Strategy for Content-Based Recommendations:__
+
+- construct item profiles
+
+  - Create vectors representing items
+
+- Construct user profiles
+
+  - Create **vectors** with same components that **describe user’s preferences**
+  - Best estimate regarding which items a user likes is **some aggregation of the profiles of those items**
+
+- **User profile possibilities:**
+
+  - Boolean utility matrix
+
+  - **Non-boolean utility matrix: (e.g., ratings)** weight the vectors representing
+
+    profiles of items by utility (rating) value
+
+- Recommend items to users based on content
+
+  - Calculate cosine distance between item __i__ and user vectors  __u__ as the degree to which the user would prefer this item
+  - Classification algorithms
+    - Use **machine learning techniques**
+    - Regard given data as a training set
+    - For each user, **build a classifier that predicts the rating of all items**
+    - Ratings on a scale of 1 to k can be directly mapped to k classes
+    - Many different classifiers:
+      - NaïveBayesclassifier
+      - K-nearestneighbor
+      - Decision trees
+      - Neuralnetworks
+
+
+
+#### Decision Tree
+
+__Classifiers:__
+
+- Classifiers of all types take a long time to construct
+  - for decision trees: need one tree per user
+- Constructing a tree requires looking at all item profiles
+- Have to consider many different predicates
+- Could involve complex combinations of features
+- Typically applied only to small problem sizes
+
+
+
+#### Summary for Content-Based Recommendations
+
+- No need for data on other users
+- Able to recommend to users with unique tastes
+- Able to recommend new & unpopular items
+- Able to provide explanations
+
+However,
+
+- Finding the appropriate features is hard
+- Have problem with recommendations for new users (how to build user profile)
+- Overspecialization
+  - Never recommends items outside user’s content profile
+  - People might have multiple interests
+  - **Unable to exploit quality judgments of other users (don’t use ratings!).**
+
+
+
+
+
+- Scale components with values that are not boolean (e.g., ratings)
+- Use Random hyperplanes (RH)* and Locality Sensitive Hashing (LSH) techniques to place item profiles (i vectors) in buckets
+- **For a given user (x vector), apply RH and LSH techniques:****identify in which bucket we look for items that might have a** **small cosine distance from user.**
+
+
+
+
+
+### Collaborative Filtering
+
+> __Example__
+>
+> - **User-based** collaborative filtering
+> - Consider user __x__
+>   - Find set **N** of other users whose ratings are “**similar**” to __x__’s ratings
+>   - Estimate **x**’s ratings based on ratings of users in **N**
+
+
+
+#### Overview
+
+- CF works by **collecting user feedback**: **ratings for items**
+  - Exploit similarities in rating behavior among users in determining recommendations
+- Two classes of CF algorithms:
+  - **Neighborhood-based or Memory-based approaches**
+    - User-based CF
+    - Item-based CF
+  - __Model-based approaches__
+    - Estimate parameters of statistical models for user ratings
+    - Latent factor and matrix factorization models
+
+
+
+
+
+#### Neighborhood-based Collabrative Filtering: User-based CF
+
+- Active user: the user we want to make predictions for
+- **User-based CF:** A subset of other users is chosen based on their similarity to the active user
+- A weighted combination of their ratings is used to make predictions for the active user
+- Steps:
+  1. Assign a weight to all users w.r.t. **similarity with the active user**
+  2. **Select** **k** **users that have the** **highest similarity** with active user (the neighborhood)
+  3. **Compute a prediction from a weighted combination of the selected neighbors’ ratings.**
+
+
+
+__Similarity between users: by what measure?__
+
+- **Weight $w_{x,y}$ is measure of similarity between user  $x$  and active user  $y$**
+- Let  $r_x$ be the vector of user $x$'s ratings
+- __Jaccard similarity__
+- __Cosine similarity__
+- __Normalized cosine similarity__ (subtract the average rating of that user from each rating)
+
+
+
+> __Pearson Correlation :__
+>
+> - **Pearson correlation measures extent to which two variables linearly relate**
+>
+> - For user  __u__, __v__: Pearson correlation is
+>   $$
+>   w_{u.v} = \frac{\sum_{i\in I}{(r_{u,i} - \bar{r}_u)(r_{v,i} - \bar{r}_v)}}{\sqrt{\sum_{i\in I}(r_{u,i} - \bar{r}_u)} \sqrt{\sum_{i\in I}(r_{v,i} - \bar{r}_v)}}
+>   $$
+>
+> - **Note: When calculating these similarities, look only at the co-rated items.**
+
+
+
+__Making User-based CF predictions with Pearson: Weighted sum of other user's ratings__
+
+- Weighted average of their ratings is used to generate predictions
+
+- To make a prediction for an active user  $a$  on an item  $i$:
+  $$
+  P_{a,i} = \bar{r}_a + \frac{\sum_{u \in U}{(r_{u,i} - \bar{r}_u)\cdot w_{a,u}}}{\sum_{u\in U}{|w_{a,u}|}}
+  $$
+  Where  $\bar{r}_a$  and  $\bar{r}_u$  are the average ratings for the user  $a$  and user  $u$  on all other rated items, and $w_{a,u}$  is the weight between the user  $a$  and $u$. The summations are over all the users  $u \in U$  who have rated the item  $i$.
+
+- __Note:__ When making predictions, calculate average of ALL co-rated items for users  $a$  and  $u$
+
+- **Summation is over all users who rated item i.**
+
+
+
+__Summary:__
+
+- In neighborhood-based CF algorithms, **a subset of nearest neighbors** of the active user are **chosen based on their similarity with active user**
+- Use these for predictions rather than all users who have rated the item.
+
+
+
+
+
+#### Neighborhood-based Collabrative Filtering: Item-based CF
+
+- Neighborhood-based CF algorithms **do not scale well**when applied to millions of users & items
+  - Due to computational complexity of search for similar users
+- **Item-to-item collaborative filtering**
+  - Rather than matching similar users
+  - **Match user’s rated items to similar items**
+- In practice, often leads to faster online systems and better recommendations
+- **Similarities between pairs of items i and j are computed off-line**
+- Predict rating of user **a** on item **i** with a simple weighted average.
+
+
+
+For the item-based algorithm, denote the set of users  $u \in U$ who rated both items  $i$  and  $j$, then the Pearson Correlation will be
+$$
+w_{i,j} = \frac{\sum_{u\in U}{(r_{u,i} - \bar{r}_i)(r_{u,j} - \bar{r}_j)}}{\sqrt{\sum_{u\in U}(r_{u,i} - \bar{r}_i)^2} \sqrt{\sum_{u\in U}(r_{u,j} - \bar{r}_j)^2}}
+$$
+where  $r_{u,i}$  is the rating of user  $u$  on item  $i$,  $\bar{r}_i$  is the average rating of the  $i$th item by those users.
+
+- **Note: Sum over set of users** ***U*** **who rated both items** ***i, j***
+- $r_{u,i}$  is rating of user  $u$  on item  $i$
+- $\bar{r}_i$ is average rating of  $i$th item by those users
+
+
+
+__Make item-based predictions using weighted average:__
+
+- Predict rating for user $u$  on item  $i$
+
+- $w_{i,n}$  is weight between item  $i$  and  $n$
+
+- $r_{u,n}$  is rating for user  $u$  on item  $n$
+
+- Summation over **neighborhood set** ***N*** **of** **items** rated by  $u$  that are most similar to  $i$
+  $$
+  P_{u,i} = \frac{\sum_{n\in N}{r_{u,n} w_{i,n}}}{\sum_{n\in N}{|w_{i,n}|}}
+  $$
+  
+
