@@ -23,7 +23,7 @@ __Outline of Course:__
 - Frequent itemsets, the Market-Basket Model and Association rules
 - Finding similar sets
   - Minhashing, Locality-Sensitive hashing
-- Recommendation systems
+- Recommender systems
   - Collaborative filtering
 - Clustering data
 - PageRank and related measures of importance on the Web (link analysis)
@@ -694,7 +694,7 @@ __The market-basket model:__
 - each basket is a small subset of items: the things one customer buys on one day
 - Want to discover Association Rules: People who bought {x,y,z} tend to buy {v,w}
   - Influences setting of prices, what to put on sale when, product placement on store shelves
-  - Recommendersystems:Amazon,Netflix,etc.
+  - Recommender systems:Amazon,Netflix,etc.
 - Really a **general many-many mapping** (association) between two kinds of things: items and baskets
   - ask about connections among “items,” not“baskets
 - The technology focuses on <u>common events</u>, not rare events
@@ -1277,7 +1277,7 @@ Many problems can be expressed as finding “similar” sets: <u>Find near-neigh
 - Pages with similar words
   - For duplicate detection, classification by topic
 - Movie Rating, NetFlix users with similar tastes in movies
-  - For recommendation systems
+  - For recommender systems
 - Customers who purchased similar products
   - Products with similar customer sets
 - Images with similar features
@@ -1760,7 +1760,7 @@ __Why it Works?__
 
 
 
-## Week7 - Recommendation System 1-2
+## Week7 - Recommender System 1-2
 
 ### Introduction and Background
 
@@ -1988,7 +1988,7 @@ __Cosine distance between 2 boolean vectors:__
 - Useful for content-based recommendations for **images**
 - Users enter words or phrases that describe items
 - GPS information/geofilters: e.g., automatically add location information when a photo is uploaded
-- **Can use tags as a recommendation system**
+- **Can use tags as a recommender system**
   - if user retrieves or bookmarks pages with certain tags, recommend other pages with same tags
 - Only works if users create tags or allow automatic geotagging.
 
@@ -2127,7 +2127,7 @@ __Similarity between users: by what measure?__
 >
 > - For user  __u__, __v__: Pearson correlation is
 >   $$
->   w_{u.v} = \frac{\sum_{i\in I}{(r_{u,i} - \bar{r}_u)(r_{v,i} - \bar{r}_v)}}{\sqrt{\sum_{i\in I}(r_{u,i} - \bar{r}_u)} \sqrt{\sum_{i\in I}(r_{v,i} - \bar{r}_v)}}
+>   w_{u,v} = \frac{\sum_{i\in I}{(r_{u,i} - \bar{r}_u)(r_{v,i} - \bar{r}_v)}}{\sqrt{\sum_{i\in I}(r_{u,i} - \bar{r}_u)} \sqrt{\sum_{i\in I}(r_{v,i} - \bar{r}_v)}}
 >   $$
 >
 > - **Note: When calculating these similarities, look only at the co-rated items.**
@@ -2161,14 +2161,14 @@ __Summary:__
 
 #### Neighborhood-based Collabrative Filtering: Item-based CF
 
-- Neighborhood-based CF algorithms **do not scale well**when applied to millions of users & items
+- Neighborhood-based CF algorithms **do not scale well** when applied to millions of users & items
   - Due to computational complexity of search for similar users
 - **Item-to-item collaborative filtering**
   - Rather than matching similar users
   - **Match user’s rated items to similar items**
-- In practice, often leads to faster online systems and better recommendations
+- In practice, often leads to <u>faster online systems and better recommendations</u>
 - **Similarities between pairs of items i and j are computed off-line**
-- Predict rating of user **a** on item **i** with a simple weighted average.
+- Predict rating of <u>user **a**</u> on <u>item **i**</u> with a simple weighted average.
 
 
 
@@ -2198,3 +2198,394 @@ __Make item-based predictions using weighted average:__
   $$
   
 
+
+
+#### Item-Item vs. User-User
+
+- In theory, user-user and item-item are dual approaches
+- In practice, item-item outperforms user-user in many use cases
+- Items are "simpler" than users
+  - Items belong to a small set of "genres", users have varied tastes
+  - Item Imilarity is more meaningful than User Similarity
+
+
+
+#### Pros/Cons of Collaborative Filtering
+
+- Pros:
+  - __Works for any kind of item__: No feature selection needed
+- Cons:
+  - __Cold Start:__ Need enough users in the system to find a match
+  - __Sparsity:__
+    - The user/ratings matrix is sparse
+    - Hard to find uders that have rated the same items
+  - __First rater:__
+    - Cannot recommend an unrated item
+    - New items, Esoteric items
+  - __Popularity bias:__ Tend to recommend popular items
+
+ 
+
+## Week9 - Recommender System 3-4
+
+### Extensions to Memory-based Algorithms
+
+- A variety of approaches/extensions have been studied to improve the performance of CF predictions
+
+- Typically involve **modifying the similarity weights** or the **ratings** used in predictions or **guessing missing ratings**
+
+- __User-based CF:__
+  $$
+  w_{u,v} = \frac{\sum_{i\in I}{(r_{u,i} - \bar{r}_u)(r_{v,i} - \bar{r}_v)}}{\sqrt{\sum_{i\in I}(r_{u,i} - \bar{r}_u)} \sqrt{\sum_{i\in I}(r_{v,i} - \bar{r}_v)}}
+  $$
+
+  $$
+  P_{a,i} = \bar{r}_a + \frac{\sum_{u \in U}{(r_{u,i} - \bar{r}_u)\cdot w_{u,a}}}{\sum_{u\in U}{|w_{a,u}|}}
+  $$
+
+- __Item-based CF:__
+  $$
+  w_{i,j} = \frac{\sum_{u\in U}{(r_{u,i} - \bar{r}_i)(r_{u,j} - \bar{r}_j)}}{\sqrt{\sum_{u\in U}(r_{u,i} - \bar{r}_i)^2} \sqrt{\sum_{u\in U}(r_{u,j} - \bar{r}_j)^2}}
+  $$
+  
+  $$
+  P_{u,i} = \frac{\sum_{n \in N}{r_{u,n}\cdot w_{i,n}}}{\sum_{n\in N}{|w_{i,n}|}}
+  $$
+
+
+
+#### Default Voting
+
+- In many collaborative filters, **pairwise similarity is computed only from the ratings in the intersection of the items both users have rated (“co-rated items”)**
+  - **Not reliable when there are too few votes** to generate similarity values (U is small)
+  - Focusing on co-rated items (“intersection set similarity”) also**neglects** **global rating** **behavior reflected in a user’s entire rating history**
+- Assuming some default voting values for the missing ratings: **can improve CF prediction performance.**
+
+
+
+**Approaches to default voting values:**
+
+- Herlocker et al. accounts for small intersection sets (small number of co-rated items) by **reducing the weight of users that have** **fewer than 50 items in common**
+  $$
+  P_{u,i} = \frac{\sum_{n\in N}{r_{u,n} w_{i,n}}}{\sum_{n\in N}{|w_{i,n}|}}
+  $$
+
+- Chee et al. **use average of the clique(small group of co-rated items) as a default voting** to extend a user’s rating history
+
+- Breese et al. **use a neutral or somewhat negative preference for the unobserved ratings** and then computes similarity between users on the resulting ratings data.
+
+
+
+#### Inverse User Frequency
+
+- **Universally liked items are not as useful in capturing similarity as less common items**
+
+- Inverse frequency
+
+  - $f_j = \log{(n/n_j)}$
+  - $n_j$ is number of users who have rated item $j$
+  - $n$ is total number of users
+
+- If everyone has rated item  $j$, then $f_j$  is zero
+
+- __Approach: transform the ratings__
+
+  - For vector similarity-based CF: new rating = original rating multiplied by  $f_j$
+    $$
+    P_{a,i} = \bar{r}_a + \frac{\sum_{u\in U}{(r_{u,i} - \bar{r}_u)\cdot w_{a,u}}}{\sum_{u\in U}{|w_{a,u}|}}
+    $$
+
+  - For every popular items, rating  $r_{u,i}$  will be greatly reduced
+
+  - Less popular items will have greater effect on prediction
+
+
+
+#### Case Amplification
+
+- Transform applied to weights used in CF prediction
+
+- Emphasizes high weights and punishes low weights
+  $$
+  w'_{i,j} = w_{i,j} \cdot |w_{i,j}|^{\rho-1}
+  $$
+  typical  $\rho$  is $2.5$
+
+- **Reduces noise in the data**
+
+- **Favors high weights**
+
+- Small values raised to a power become negligible
+
+
+
+#### Imputation-Boosted CF
+
+- When the rating data for CF tasks are extremely sparse: hard to produce accurate predictions using the Pearson correlation-based CF
+- Su et al. proposed imputation-boosted collaborative filtering (IBCF)
+- **First uses an imputation technique to fill in missing data**
+  - **imputation** is the process of replacing missing data with substituted values
+- **Then use traditional Pearson correlation-based CF algorithm** on this completed data to predict a user rating for a specified item
+  - mean imputation, linear regression imputation, predictive mean matching imputation, Bayesian multiple imputation, and machine learning classifiers (including naıve Bayes, SVM, neural network, decision tree, lazy Bayesian rules)
+
+
+
+### Evaluating Recommender Systems
+
+#### The Netflix Prize
+
+- Training data
+  - 100 million ratings, 480,000 users, 17,770 movies
+  - 6 years of data: 2000-2005
+- Test data
+  - Last few ratings of each user (2.8 million)
+  - **Evaluation criterion:** Root Mean Square Error (RMSE)
+  - Netflix system RMSE: 0.9514
+- Competition
+  - **$1 million** prize for 10% improvement on Netflix
+
+
+
+#### Evaluation
+
+- __Goal:__ Make good recommendations
+  - Quantify goodness using __RMSE__:Lower RMSE $\to$ better recommendations
+  - Want to make good recommendations on items that user has not yet seen. 
+
+
+
+#### Collaborative Filtering Overview
+
+CF works by **collecting user feedback**: **ratings for items**
+
+- Exploit similarities in rating behavior among users in determining recommendations
+
+
+
+__Two classes of CF algorithms:__
+
+1. Neighborhood-based or Memory-based approaches
+   - User-based CF
+   - Item-based CF
+2. Model-based approaches
+   - Estimate parameters for statistical models for user ratings
+   - Latent factor and matrix factorization models
+
+
+
+### Model-Based CF
+
+- Provide recommendations by estimating parameters of statistical models for user ratings
+
+- Design and development of models can allow system to learn to recognize complex patterns
+
+  - Based on training set – supervised learning
+
+- Then make intelligent predictions for CF tasks based on
+
+  the **learned models**
+
+- Examples:
+
+  - Bayesian models
+  - Clustering models
+  - Dependency networks
+  - Classification algorithms (if users rating are in categories)
+  - Regression models and SVD methods for umerical ratings
+
+
+
+#### Clustering CF
+
+- Cluster = collection of data objects that are:
+
+  - Similar to one another within the same cluster
+  - Dissimilar to objects in other clusters
+
+- Measurement of similarity between objects uses:
+
+  - Pearson correlation
+
+  - Cosine similarity
+
+  - Minkowski distance
+
+    - Two objects  $X=(x_1,x_2,\ldots,x_n), Y=(y_1,y_2,\ldots,y_n)$
+
+    - Where  $q$  is a positive integer
+
+    - If  $q=2$ : Euclidean distance
+      $$
+      d(X,Y) = \sqrt[q]{\sum_{i=1}^n{|x_i - y_i|^q}}
+      $$
+
+
+
+__Clustering Algorithms:__
+
+- Common clustering method
+  - K-Means
+  - Hierarchical Clustering
+  - Mean-Shift
+- Key operation: Repeatedly combine two nearest clusters
+- **Euclideancase:** each cluster has a ***centroid*** = average of its (data)points
+
+
+
+##### K-means Algorithm
+
+- Assumes Euclidean space/distance
+- Start by picking ***k***, the number of clusters
+- Initialize clusters by picking one point per cluster
+- Populating clusters:
+  1. For each point, place it in the cluster whose current centroid it is nearest
+  2. After all points are assigned, update the locations of centroids of the ***k*** clusters
+  3. Reassign all points to their closest centroid (Sometimes moves points between clusters)
+  4. Repeat 2 and 3 util convergence
+
+
+
+##### Clustering CF Algorithms
+
+- Clustering is an intermediate step
+- Resulting clusters used for further analysis or precessing
+  - For classification and other tasks
+  - Example: partition data into clusters; then use memory-based CF algorithm like Pearson correlation to make predictions within each cluster
+- Clustering algorithms have **better scalability than typical CF methods** because they **make predictions on smaller clusters rather than whole customer base**
+- **Complex and expensive clustering computation run offline**
+- **Recommendation quality is generally low**
+- Optimal clustering over large data sets is impractical
+  - Most applications use greedy cluster generation techniques
+
+#### Regression-based CF
+
+- For memory-based CF algorithms: **in some cases, two rating vectors may have:**
+
+  - Large Euclidean distance
+  - but have very high similarity using vector cosine or Pearson correlation measures **- noise**
+
+- Numerical ratings are common in real recommender
+
+  systems
+
+- Regression methods: good at making predictions for numerical values
+
+- **Uses an approximation of the ratings to make predictions based on a regression model.**
+
+
+
+__Linear regression:__
+
+- Data are modeled using <u>linear predictor functions</u>, and unknown model <u>parameters</u> are <u>estimated</u> from the data
+- Such models are called *linear models*
+- If the goal is prediction, forecasting, or reduction, linear regression can be used to **fit a predictive model to an observed data set of** ***y*** **and** ***X*** **values**
+- After developing such a model, if an additional value of *X* is then given without its accompanying value of *y*
+  - the fitted model can be used to **make a prediction of the value of** ***y***
+
+
+
+##### Regression method
+
+- Let  $X=(X_1, X_2, \ldots, X_m)$  be a random variable representing <u>user's preference</u> on different items
+
+- Linear regression method:
+
+  $Y = \Lambda X + N$
+
+  $\Lambda$ is an  $n\times k$  matrix
+
+  $N=(N_1,N_2,\ldots,N_n)$  is a random variable representing Noise in user choices
+
+  $Y$ is an $n\times m$ matrix where  $Y_{ij}$  is rating of user  $i$  on item  $j$
+
+  $X$  is a  $k \times m$  matrix with each column as estimate of the value of the random variable  $X$ (user's rating in k-dimensional rating space for one user)
+
+
+
+### Characteristics and Challenges of Collaborative Filtering
+
+__Data Sparsity:__
+
+- Many commercial recommender systems are used with very large product sets
+- Most users do not rate most items: User-item matrix is extremely sparse
+- For CF: reduces probability of finding set of users with similar ratings
+
+- Approaches:
+  - **Dimensionality reduction techniques**
+    - SVD: remove unrepresentative or insignificant users or items to reduce size of user-item matrix
+    - Latent semantic Indexing: similarity between users is determined by representation of users in reduced space
+    - Principle Component Analysis
+
+
+
+__Cold start problem:__
+
+- When a new user or item has just entered the system
+- **New item problem:** can’t be recommended until some users rate it
+- **New users**: not given good recommendations because of lack of rating or purchase history
+- __Approaches:__
+  - **Content-based systems** do not rely on ratings from other users
+  - **Hybrid CF (content-boosted CF)**: external content information can be used to produce predictions for new users or new items
+
+
+
+__Synonyms:__
+
+- **Same or very similar items that have different names or entries**
+
+- Most recommender systems are unable to discover this latent association
+
+- Treat these products differently
+
+- **Synonyms decrease recommendation performance of CF**
+
+  **systems**
+
+- __Approaches:__
+
+  - **Automatic term expansion** or **construction of thesaurus**
+    - Some added terms may have different meanings than  intended
+  - __SVD: Latent semantic Indexing (LSI):__ construct a semantic space where terms and documents that are closely associated are placed close to each other
+
+
+
+__Scalability:__
+
+- **Traditional CF systems suffer scalability problems at very large scale**
+- Approaches:
+  - **Dimensionality reduction (SVD)** can scale and quickly produce good recommendations (expensive matrix factorization)
+  - Memory-based CF algorithms (e.g., **item-based Pearson correlation CF algorithm**) have good scalability
+
+
+
+**Gray Sheep:**
+
+- Users whose opinions **do not consistently agree or disagree with any group of people**
+
+- Do not benefit from collaborative filtering
+
+- Approaches:
+
+  - **Hybrid approach combining content-based and CF recommendations**
+
+  - Base prediction on **weighted average of content-based prediction and CF prediction**
+
+  - Weights are determined on a per-user basis
+
+  - System determines optimal mix of content and CF-based
+
+    recommendations
+
+
+
+__Black sheep:__ Idiosyncratic tastes make recommendations nearly impossible: considered an acceptable failure
+
+### Hybrid Recommendation Systems
+
+1. **Weighted:** The score of different recommendation components are combined numerically
+2. **Switching:** The system chooses among recommendation components and applies the selected one.
+3. **Mixed:** Recommendations from different recommenders are presented together.
+4. **Feature Combination:** Features derived from different knowledge sources are combined together and given to a single recommendation algorithm.
+5. **Feature Augmentation:** One recommendation technique is used to compute a feature or set of features, which is then part of the input to the next technique.
+6. **Cascade:** Recommenders are given strict priority, with the lower priority ones breaking ties in the scoring of the higher ones.
+7. **Meta-level:** One recommendation technique is applied and produces some sort of model, which is then the input used by the next technique.

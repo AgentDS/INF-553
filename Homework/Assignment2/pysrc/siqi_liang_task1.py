@@ -205,6 +205,7 @@ if __name__ == "__main__":
     raw_data_without_header = raw_data.filter(lambda x: x != header)
     clean_data = raw_data_without_header.map(lambda line: [i for i in line.strip().split(',')])
 
+
     # whether there is faster method??
     if case == 1:
         baskets = clean_data.map(lambda x: (x[0], [x[1]])).reduceByKey(lambda a, b: a + b).map(
