@@ -275,12 +275,27 @@ Now run Scala in the terminal:![scala](./Note/pic/scala.png)
 - HW3
 
   - Task1: min-hash & LSH to find similar business_id pars
+
     - Jaccard similarity: 
+
       - Use ``mapPartitions()`` instead of ``.map()`` for most ``RDD`` operations to speed up
-      - local test shows optimal ``numPartitions=5`` using ``sc.parallelize()`` to load input file (sometimes ``parallelize()`` is not large enough to load input file), with pure computation time <u>8 seconds</u> for the whole process (``load data``$\to$``min-hash``$\to$``LSH``$\to$``compute similarty``$\to$``write result``),  <u>script running time 12.4 seconds, precision=1.0, recall=0.99</u>.
+
+      - local test shows optimal ``numPartitions=5`` using ``sc.parallelize()`` to load input file (sometimes ``parallelize()`` is not large enough to load input file), with 
+
+        - pure computation time <u>8 seconds</u> for the whole process (``load data``$\to$``min-hash``$\to$``LSH``$\to$``compute similarty``$\to$``write result``), 
+
+        - <u>script running time 12.4 seconds</u> (use ``time spark-submit script.py``, cpu time)
+
+        - <u>precision=1.0</u>, 
+
+        - <u>recall=0.99</u>.
+
       - local ``numPartitoins``-``data load method`` experiment results in [task1 experiment log file](./Homework/Assignment3/pysrc/experiment_time.txt)  ([experiment script](./Homework/Assignment3/pysrc/task1_local_experiment))
+
       - Question: ``sc.textFile()`` with  customized ``minPartitions`` works similar to ``sc.parallelize()`` with customized ``numPartitions``, so what's the difference? (not clear after searching on Google)
+
     - Cosine similarity: optional, not implemented
+
   - Task2: Collaborative filtering
 
 - HW4
