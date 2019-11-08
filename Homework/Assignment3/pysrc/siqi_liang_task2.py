@@ -128,6 +128,7 @@ if __name__ == "__main__":
     if case_id == 1:
         # Model-based CF
         # local test CPU time: 17.60s
+        # local test yelp_val.csv RMSE: 1.06646
         model_based_CF(train_file_path, test_file_path, output_file_path)
     elif case_id == 2:
         # User-based CF
