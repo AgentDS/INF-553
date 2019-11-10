@@ -1,0 +1,5 @@
+neighbor_K = 15, Dutation = 76, RMSE = 1.170332
+neighbor_K = 17, Dutation = 75, RMSE = 1.170169
+neighbor_K = 20, Dutation = 75, RMSE = 1.169810
+neighbor_K = 23, Dutation = 75, RMSE = 1.169934
+neighbor_K = 25, Dutation = 77, RMSE = 1.169997

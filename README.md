@@ -290,13 +290,22 @@ Now run Scala in the terminal:![scala](./Note/pic/scala.png)
 
         - <u>recall=0.99</u>.
 
-      - local ``numPartitoins``-``data load method`` experiment results in [task1 experiment log file](./Homework/Assignment3/pysrc/experiment_time.txt)  ([experiment script](./Homework/Assignment3/pysrc/task1_local_experiment))
+      - local ``numPartitoins``-``data load method`` experiment results in [task1 experiment log file](./Homework/Assignment3/pysrc/experiment_time.txt)  ([experiment script](./Homework/Assignment3/pysrc/task1_local_experiment.py))
 
       - Question: ``sc.textFile()`` with  customized ``minPartitions`` works similar to ``sc.parallelize()`` with customized ``numPartitions``, so what's the difference? (not clear after searching on Google)
 
     - Cosine similarity: optional, not implemented
 
   - Task2: Collaborative filtering
+
+    Detail and tips see [implementation description file](./Homework/Assignment3/INF553_HW3_siqi_liang_description.pdf)
+    
+  - Model-based
+    - User-based
+    
+    > - ``statistics.mean(list)`` is slower than ``sum(list)/len(list)``!!!!!! After replacing ``statistics.mean()`` with ``sum(list)/len(list)``, local user-based test time is around 70s (150s before replacement)
+    > - It seems if we use user_avg as the prediction for all pairs, RMSE<1.07 on ``yelp_test.csv``__?!?!?!?!?!?!?!?!!?__ 
+    > - 
 
 - HW4
 
