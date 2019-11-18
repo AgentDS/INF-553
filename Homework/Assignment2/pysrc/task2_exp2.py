@@ -255,8 +255,8 @@ if __name__ == '__main__':
         end = time()
         duration = int(end - start)
         duration_hist.append(duration)
-        print("    {0:2d}             {1:4d}".format(minPartition, duration))
+        print("    {0:2d}             {1:4d}s".format(minPartition, duration))
     with open(log_file, 'w') as log_f:
         print("numPartition      duration", file=log_f)
         for i in range(len(numPartitions)):
-            print("    {0:2d}             {1:4d}".format(numPartitions[i], duration_hist[i]), file=log_f)
+            print("    {0:2d}             {1:4d}s".format(numPartitions[i], duration_hist[i]), file=log_f)
