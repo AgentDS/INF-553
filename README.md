@@ -270,7 +270,14 @@ Now run Scala in the terminal:![scala](./Note/pic/scala.png)
     - for ``small2.csv`` case 1 with ``support=4``, local test shows ``minPartition=3``, ``A_priori_short_basket()`` works better. Local test takes 7 seconds. 
     - for ``small1.csv`` case 2 with ``support=9``, local test shows ``minPartition=2``, ``A_priori_long_basket()`` works better. Local test takes 8 seconds. 
     - ``A_priori_long_basket()`` optimizes the process of generating itemset size  $k+1$  from itemset size  $k$
-  - Task 2: use ``A_priori_long_basket()``, local test shows ``minPartition=6`` works better. Local test takes around 202 seconds.
+    
+  - Task 2: 
+
+    - collect frequent singleton as well as frequent pairs using brute-force (emit all possible singletons/pairs in each basket, then filter using ``support``)
+    - Then delete all baskets with ``size=1`` or ``size=2`` (delete around 16000 such baskets), which helps to speed up for later steps
+    - using A-priori only to find candidate itemset with ``size>=3``
+
+    - use ``A_priori_long_basket()``, local test shows ``minPartition=3`` works better. Local test takes around 217 seconds.
 
 - HW3
 
