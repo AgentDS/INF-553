@@ -65,11 +65,14 @@ def emit_id_pairs_user_base(lines, uidx2id_bc, bidx2id_bc):
         yield string
 
 
-def cal_weight(user1_ratings, user2_ratings):
+def cal_weight(user1_ratings, user2_ratings, corated_avg=True, user2_global_ratings=None):
     # normalize first
     n = len(user1_ratings)
     mean1 = sum(user1_ratings) / float(n)
-    mean2 = sum(user2_ratings) / float(n)
+    if corated_avg is True:
+        mean2 = sum(user2_ratings) / float(n)
+    else:
+        mean2 = sum(user2_global_ratings) / len(user2_global_ratings)
     user1_ratings = [i - mean1 for i in user1_ratings]
     user2_ratings = [i - mean2 for i in user2_ratings]
     numerator = sum([r1 * r2 for r1, r2 in zip(user1_ratings, user2_ratings)])
@@ -125,7 +128,9 @@ def user_based_predict(pairs, user_ratings_bc, business_ratings_bc, user_bidxs_b
                 if len(cobusiness) > 1:
                     user1_rating = [user_ratings_bc.value[user1][i] for i in cobusiness]
                     user2_rating = [user_ratings_bc.value[user2][i] for i in cobusiness]
-                    sim, mean2 = cal_weight(user1_rating, user2_rating)
+                    # sim, mean2 = cal_weight(user1_rating, user2_rating, corated_avg=True)
+                    user2_global_ratings = list(user_ratings_bc.value[user2].values())
+                    sim, mean2 = cal_weight(user1_rating, user2_rating, corated_avg=False, user2_global_ratings=user2_global_ratings)
                     weighted_ratings.append(sim * (user_ratings_bc.value[user2][business] - mean2))
                     weights.append(sim)
             # use top-K similar users' ratings to predict
