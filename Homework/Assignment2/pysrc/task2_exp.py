@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 9/27/19 3:02 AM
+# @Time    : 11/17/19 1:58 AM
 # @Author  : Siqi Liang
 # @Contact : zszxlsq@gmail.com
-# @File    : siqi_liang_task2.py
+# @File    : task2_exp.py
 # @Software: PyCharm
 
 from pyspark import SparkContext
-import csv
 import sys
+import csv
 from time import time
 from collections import Counter
 from itertools import combinations
@@ -149,18 +149,73 @@ def A_priori_long_basket(baskets, support, total_baskets_cnt):
     return candidate_itemsets
 
 
-if __name__ == "__main__":
-    argv = sys.argv
-    filter_threshold = int(argv[1])
-    support = int(argv[2])
-    input_file = argv[3]
-    output_file = argv[4]
+def A_priori_short_basket(baskets, support, total_baskets_cnt):
+    clean_baskets = list(baskets)
+    local_support = support * len(clean_baskets) / float(total_baskets_cnt)
+    baskets_cnt_ordered = sorted(Counter([len(basket) for basket in clean_baskets]).items(), reverse=True)
+    # Reduce max_itemset_size, if the number of baskets with certain length is less than local_support,
+    # then the maximum size of frequent itemset must be smaller than the length of such baskets
+    acc_sum = 0
+    for cnt_item in baskets_cnt_ordered:
+        max_itemset_size = cnt_item[0]
+        acc_sum += cnt_item[1]
+        if acc_sum >= local_support:
+            break
+        else:
+            continue
+    candidate_itemsets = []
+
+    # frequent items
+    single_cnt = Counter()
+    for basket in clean_baskets:
+        single_cnt.update(basket)
+
+    candidate_single = sorted([i for i in single_cnt if single_cnt[i] >= local_support])
+    former_candidate = candidate_single
+    candidate_itemsets.extend(former_candidate)
+
+    # frequent itemsets with size >= 2
+    for itemset_size in range(2, max_itemset_size + 1):
+        itemset_cnt = {}
+        for basket in clean_baskets:
+            if len(basket) < itemset_size:
+                continue
+            for itemset in combinations(basket, itemset_size):
+                itemset = sorted(itemset)
+                if itemset_size == 2:
+                    immediate_subset_flag = True
+                    for immediate_subset in combinations(itemset, itemset_size - 1):
+                        if immediate_subset[0] not in former_candidate:
+                            immediate_subset_flag = False
+                            break
+                else:
+                    immediate_subset_flag = True
+                    for immediate_subset in combinations(itemset, itemset_size - 1):
+                        if '_'.join(sorted(immediate_subset)) not in former_candidate:
+                            immediate_subset_flag = False
+                            break
+                if immediate_subset_flag:
+                    itemset_string = '_'.join(itemset)
+                    if itemset_string not in itemset_cnt:
+                        itemset_cnt[itemset_string] = 0
+                    itemset_cnt[itemset_string] += 1
+        # keep itemset in form of id1_id2_id3 for sake of later hash
+        former_candidate = [i for i in itemset_cnt if itemset_cnt[i] >= local_support]
+        candidate_itemsets.extend(former_candidate)
+
+    return candidate_itemsets
+
+
+def run_all(minPartition, method="long"):
+    filter_threshold = 20
+    support = 50
+    input_file = "/Users/liangsiqi/Documents/Dataset/ta_feng_dataset/ta_feng_all_months_merged.csv"
+    output_file = "./local_task2.csv"
     pair_out_file = "./Customer_product.csv"
-    start = time()
 
     # part 1: clean raw data file to (DATE-CUSTOMER_ID,PRODUCT_ID) pairs and write into file
     sc = SparkContext.getOrCreate()
-    raw_data = sc.textFile(input_file)
+    raw_data = sc.textFile(input_file, minPartition)
     header = raw_data.first()
     raw_data_without_header = raw_data.filter(lambda x: x != header)
     # "TRANSACTION_DT","CUSTOMER_ID","AGE_GROUP","PIN_CODE","PRODUCT_SUBCLASS","PRODUCT_ID","AMOUNT","ASSET","SALES_PRICE"
@@ -172,7 +227,6 @@ if __name__ == "__main__":
             print(pair[0] + ',' + '%d' % pair[1], file=out_f)
     sc.stop()
 
-    # part 2: SON
     minPartition = 6
     sc = SparkContext.getOrCreate()
     raw_data = sc.textFile(pair_out_file, minPartition)
@@ -189,7 +243,14 @@ if __name__ == "__main__":
     total_baskets_cnt = clean_baskets.count()
 
     # phase 1
-    phase1_map = clean_baskets.mapPartitions(lambda subset: A_priori_long_basket(subset, support, total_baskets_cnt)).map(lambda x: (x, 1))
+    if method == 'long':
+        phase1_map = clean_baskets.mapPartitions(lambda subset: A_priori_long_basket(subset, support, total_baskets_cnt)).map(
+            lambda x: (x, 1))
+    elif method == 'short':
+        phase1_map = clean_baskets.mapPartitions(lambda subset: A_priori_short_basket(subset, support, total_baskets_cnt)).map(
+            lambda x: (x, 1))
+    else:
+        raise ValueError("method could only be 'long' or 'short'!")
     phase1_reduce = phase1_map.reduceByKey(lambda x, y: 1).keys().collect()
 
     # phase 2
@@ -202,6 +263,24 @@ if __name__ == "__main__":
         print("", file=f)
         sort_into_file(phase2_reduce, "Frequent Itemsets:", f)
 
-    end = time()
     sc.stop()
-    print("Duration: %d" % int(end - start))
+
+
+if __name__ == '__main__':
+    log_file = "./task2_local_log.txt"
+    numPartitions = [50, 70]
+    methods = ['long']
+    duration_hist_long = []
+    print("numPartition        method      duration")
+
+    for minPartition in numPartitions:
+        start = time()
+        run_all(minPartition, 'long')
+        duration = int(time() - start)
+        print("{0:2d}                  {1}       {2:4d}s".format(minPartition, 'long', duration))
+        duration_hist_long.append(duration)
+
+    with open(log_file, 'w') as log_f:
+        print("numPartition        method      duration", file=log_f)
+        for i in range(len(numPartitions)):
+            print("{0:2d}                  {1}       {2:4d}s".format(numPartitions[i], 'long', duration_hist_long[i]), file=log_f)

@@ -2837,6 +2837,7 @@ Make community membership edges directed.
 
 
 
+## Week11-Social Networks 2
 
 
 
@@ -2845,3 +2846,431 @@ Make community membership edges directed.
 
 
 
+
+## Week11-Clustering
+
+__High dimensional data:__
+
+- Given a cloud of data points we want to understand its **structure**
+- Group points into **“clusters”** according to some**distance measure**
+
+
+
+__Problem of Clustering:__
+
+- Given a **set of points** that belong to some **space**, with a notion of **distance** between points
+- **Group the points** into some number of ***clusters***, so that:
+  - Members of **a cluster** are **close/similar** to each other
+  - Members of **different clusters** are **dissimilar**
+- Usually:
+  - Points are in a high-dimensional space
+  - Similarity is defined using a **distance measure**
+
+
+
+__Difficulties in clustering?__
+
+- High dimensional spaces is difficult
+  - __Curse of dimensionality:__ In high dimensions, almost all pairs of points are **equally far away** from one another; almost any **two vectors are orthogonal**.
+
+
+
+
+
+__Clustering Methods:__
+
+- Hierarchical clustering
+  - Attach datapoints to root points
+- K-Means clustering
+  - Centroid-based
+- Density-based methods
+  - Clusters contain a minimal number of datapoints
+
+
+
+
+
+__Clustering algorithms:__
+
+- __Hierarchical clustering__
+  - centroid
+  - clustroid
+  - dendrogam
+- __Point assignment__
+  - K-means: cluster centers, centroids
+  - BFR: extend k-means to handle large data set
+  - CURE
+
+
+
+### Hierarchical Clustering
+
+Overview:
+
+- **Agglomerative** (bottom up):
+  - Initially, each point is a cluster
+  - Repeatedly combine the two “nearest” clusters into one
+- __Divisive__ (top down):
+  - Start with one cluster and recursively split it
+
+
+
+#### Agglomerative
+
+__Key operation:__ Repeatedly combine two nearest clusters
+
+__Three key questions:__
+
+- How do you represent a **cluster of more than one** point?
+
+  **Euclidean case:** each cluster has a ***centroid*** **= average of its (data) points**
+
+- How do you determine the **“nearness”** of clusters?
+
+  - Measure cluster distances by distances of centroids
+
+- When to **stop combining** clusters?
+
+
+
+__Merging rule:__
+
+- the distance between two clusters is distance between their centroids
+- $dist(C1,C2)=$distance of their centroids
+- $C1:\{(1,2), (2,2)\}$
+  - Centroid = $(1.5, 2)$
+- merge two clusters at shortest distance
+
+
+
+##### When to stop clustering process?
+
+1. **May know how many clusters** there are in the data
+   - Have been told or some **intuitive number of clusters**
+2. Stop combining **when best combination** of existing clusters produces a cluster that is inadequate
+   - Average distance between centroid and its points should be below some limit
+
+
+
+**Rules for Controlling Hierarchical Clustering: Picking Clusters to Merge**
+
+1. Find pair with **smallest distance between centroids** (previous)
+2. Take distance between two clusters **as minimum of distances between any two points, one chosen from each cluster**
+   - Merge two clusters with minimum distance
+   - May result in entirely different clustering from distance-of-centroids
+3. Take distance between two clusters to be **average distance of all pairs of points, one from each cluster**
+   - Merge two clusters with smallest average distance
+4. **Radius of cluster** **= maximum distance between all points and the centroid**
+   - Combine two clusters whose resulting cluster has lowest radius
+5. **Diameter of cluster =** **maximum distance between any two points of the cluster**
+   - Merge the clusters whose resulting clusters has the smallest diameter
+
+
+
+
+
+##### Non-Euclidean Case
+
+The only “locations” we can talk about are the points themselves: no “average” of two points.
+
+
+
+1. **How to represent a cluster of many points?**
+
+   - ***clustroid*** = (data)point “***closest***” to other points
+
+   - Possible meaning of "closest":
+
+     - **Smallest maximum distance** to other points
+
+     - **Smallest average distance** to other points in the cluster
+
+     - **Smallest sum of squares of distances** to other points
+
+       - For distance metric ***d*** clustroid ***c*** of cluster ***C*** is
+         $$
+         \min_c{\sum_{x\in C}{d(x,c)^2}}
+         $$
+
+2. **How do you determine the “nearness” of clusters?**
+
+   - Treat clustroid as if it were centroid, when computing inter-cluster distances
+   - Approach1: **Intercluster distance** = minimum of the distances between any two points, one from each cluster
+   - Approach2: Pick a notion of “**cohesion**” of clusters, *e.g.*, maximum distance from the **clustroid**
+     - Merge clusters whose *union* is most cohesive
+
+3. __When to stop merging?__
+
+   - Approach1: Pick a number **k** upfront, and stop when we have **k** clusters
+     - Makes sense when we know that the data naturally falls into k classes
+   - Approach2: Stop when the next merge would create a cluster with low “cohesion”
+
+
+
+__Cohesion:__
+
+- **Merge clusters whose** ***union*** **is most cohesive**
+- Approach 3.1: **Diameter** of the merged cluster = maximum distance between points in the cluster
+- Approach 3.2: **Radius**= maximum distance of a point from **centroid** (or clustroid)
+- Approach 3.3: Use a **density-based approach**
+  - Density = number of points per unit volume
+  - divide number of points in cluster by **diameter or radius of the cluster**
+  - Perhaps use a power of the radius (e.g., square or cube)
+
+
+
+#### Complexity of Hierarchical Clustering
+
+- $n$ data points
+- at most $n-1$ step of merging
+- Naive implementation, e.g., storing pairwise cluster distances in a matrix
+
+
+
+#### Implementation
+
+- **Naïve implementation of hierarchical clustering:**
+  - At each step, compute pairwise distances between all pairs of clusters, then merge
+    - Initially, $O(n^2)$ for creating matrix and finding pair with minimum distance
+    - Subsequent merge $\to$ overall complexity: $O(n^3)$
+- Careful implementation using **priority queue** can reduce time to $O(N^2 \log{N})$
+  - Still too expensive for big datasets that don't fit in memory
+
+
+
+### K-Means Clustering
+
+K-means clustering is centroid-based.
+
+
+
+## Week 11 - Social networks 2: Clustering 
+
+__Divisive (top down):__ Start with one cluster and recursively split it.
+
+__Betweenness Concept:__
+
+- <u>Edge betweenness:</u> Number of shortest paths passing over the edge
+- Find edges in a social network graph that are least likely to be inside a community
+- Betweenness of edge (a, b):
+  - number of pairs of nodes $x$ and $y \to x$, $x,y \in C$
+  - **edge (a,b) lies on the shortest path between x and y**
+- If there are several shortest paths between x and y, edge (a,b) is credited with the fraction of those shortest paths that include edge (a,b)
+- **A high score is bad:** suggests that edge (a,b) runs between two different communities
+  - a and b are in different communities
+
+
+
+
+
+<u>How to compute betweenness?</u>
+
+<u>How to select the number of clusters?</u>
+
+
+
+### Girvan-Newman Algorithm
+
+- Want to **discover communities using divisive hierarchical clustering**
+  - Start with one cluster (the social network) and recursively split it
+- **Will do this** based on the notion of edge **betweenness**:
+  - **Number of shortest paths passing through the edge**
+- **Girvan-Newman Algorithm:**
+  - Visits each node X once
+  - Computes the number of shortest paths from X to each of the other nodes that go through each of the edges
+- __Repeat:__
+  - Calculate betweenness of edges
+    1. **Thresholding** to remove high betweeness edges, or
+    2. **Remove edges** with highest betweenness: **between** communities
+- **Connected components are communities**
+- Gives a hierarchical decomposition of the network
+
+
+
+#### Using Betweenness to Find Communities: Clustering
+
+- **Betweenness scores for edges of a graph behave something like a distance metric**
+
+  - Not a true distance metric
+
+- **Could cluster by taking edges in increasing order of betweenness and adding to graph one at a time**
+
+  - At each step, connected components of graph form clusters
+
+- **Girvan-Newman: Start with the graph and all its edges and**
+
+  **remove edges with highest betweenness**
+
+  - **Continue until graph has broken into suitable number of connected components**
+  - **Divisive hierarchical clustering** (top down)
+    - Start with one cluster (the social network) and recursively split it.
+
+
+
+#### Run Girvan-Newman Iteratively for Community Detection
+
+- **Repeat until no edges are left:**
+  - Calculate betweenness of edges
+  - This time: remove edges with highest betweenness
+- Connected components are communities
+- Gives a hierarchical decomposition of the network
+
+
+
+
+
+### How to select the number of clusters
+
+#### Network Communities
+
+- __Communities:__ sets of tightly connected nodes
+
+- Define: __Modularity $Q$__
+
+  - A measure of how well a network is partitioned into communities
+
+  - Given a partitioning of the network into groups   $s \in S$:
+    $$
+    Q = \sum_{s\in S}[(\text{# edges within group } s) - (\text{expect # edges within group }s)]
+    $$
+
+- $Q(G,S) = \frac{1}{2m} \sum_{s\in S}\sum_{i\in s}\sum_{j\in s}{(A_{ij} - \frac{k_i k_j}{2m})}$, where $A_{ij}=1$ if $i$ connects $j$
+
+- $Q \in [-1,1]$
+
+  - It is positive if the number of edges within groups exceeds the expected number
+  - $Q>0.7$  means significant community structure
+
+- __Null Model: configuration model__
+
+  - **Given real** 𝑮 **on** 𝒏 **nodes** **and** 𝒎 **edges**, construct rewired network 𝑮’
+    - Same degree distribution but random connections
+    - Consider 𝑮’ as a multigraph
+    - **The expected number of edges between nodes $i$ and $j$ of degree $k_i$ and $k_j$** equals to: $\frac{k_i k_j}{2m}$
+      - The expected number of edges in (multigraph) **G’**: $2m$
+
+
+
+<u>Modularity is useful for selecting the number of clusters.</u>
+
+
+
+
+
+### Spectral Clustering
+
+#### Partitioning Graphs
+
+- Another approach to organizing social networking graphs
+- Problem: partitioning a graph to minimize the number of edges that connect different components (communities)
+- Goal of minimizing the cut size
+
+
+
+**What makes a good partition?**
+
+- Divide nodes into two sets so that the **cut (set of edges that connect nodes in different sets) is minimized**
+- Want the two sets to be approximately equal in size
+- **Maximize** the number of within-group connections
+- **Minimize** the number of between-group connections
+
+
+
+**Smallest cut is not necessarily the best cut!!!!!!!!**
+
+<img src="./pic/mincut.png" height="180px">
+
+
+
+__Graph Cuts:__
+
+- Express partitioning objectives as a function of the “edge cut” of the partition
+
+- **Cut:** Set of edges with only one vertex in a group:
+  $$
+  cut(A,B)=\sum_{i\in A,j\in B}{w_{ij}}
+  $$
+
+- __Criterion 1:__ Minimum-cut
+
+  Minimize weight of connections between groups $\arg\min_{A,B}{cut(A,B)}$
+
+  __Problem:__ 
+
+  - Only considers external cluster connections
+  - Does not consider internal cluster connectivity
+
+- __Criterion 2:__ Normalized-cut
+
+  Connectivity between groups relative to the density of each group
+  $$
+  ncut(A,B)= \frac{cut(A,B)}{vol(A)} + \frac{cut(A,B)}{vol(B)}
+  $$
+  Where $vol(A)$  is the total number of edges with at least one endpoint in $A$: $vol(A) = \sum_{i\in A}{k_i}$
+
+  <u>This helps to produce more balanced partitions!!!</u>
+
+
+
+**How do we efficiently find a good partition?**
+
+- **Problem:** Computing optimal cut is NP-hard
+
+
+
+
+
+#### Using Matrix Algebra to Find Good Graph Partitions
+
+- Three matrices that describe aspects of a graph:
+  - Adjacency Matrix
+  - Degree Matrix
+  - Laplacian Matrix: difference between degree and adjacency matrix
+- Then get a good idea of how to partition graph from eigenvalues and eigenvectors of its Laplacian matrix
+
+
+
+$A$: adjacency matrix of undirected  $G$, $A_{ij}=1$  if $(i,j)$  is an edge, else $0$
+
+$D$: degree matrix $D$, $n \times n$ diagonal matrix; $D=[d_{ii}]$, where $d_{ii}=$degree of mode $i$
+
+__Laplacian matrix $L$:__ $n \times n$ symmetric matrix, $L=D-A$
+
+$x$ is a vector in $\mathbb{R}^n$ with components $(x_1,\ldots,x_n)$, think of it as a label/value of each node of $G$.
+
+<img src="./pic/spectralgraph.png" height="180px">
+
+
+
+__What is the meaning of $Ax$?__
+
+<img src="./pic/spectral2.png" height="300px">
+
+**Important properties of symmetric matrices:**
+
+- Eigenvalues are non-negative real numbers: 
+
+- **Eigenvectors** are real and orthogonal
+- $\bf{x}^T \bf{1} = \sum_{i=1}^n x_i = 0$
+
+
+
+
+
+- **Smallest eigenvalue** for every Laplacian matrix is **0**
+
+- Its corresponding eigenvector is  $[1,1,1,...1]$
+
+- To find **second-smallest eigenvalue** for symmetric matrix (such as Lapalcian)
+
+- Value of $x$ that achieves this minimum is the **second eigenvector**
+
+- This second smallest eigenvector x will have some positive and some negative components 
+
+- **Partition the graph by taking one set to be the nodes I whose corresponding vector component xi is positive**
+
+- **What is the meaning of $\min x^T L x$ on $G$?**
+  $$
+  \bf{x}^T L \bf{x} = \sum_{(i,j)\in E}{(x_i - x_j)^2}
+  $$
+  
