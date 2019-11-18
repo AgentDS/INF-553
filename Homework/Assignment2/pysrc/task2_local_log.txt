@@ -1,0 +1,7 @@
+numPartition      duration
+     3              220s
+     4              215s
+     5              237s
+     6              266s
+     7              308s
+    10              418s

@@ -220,19 +220,20 @@ def run_all(minPartition):
     frequent_pairs_bc = sc.broadcast(frequent_pairs)
     clean_baskets_step3 = clean_baskets_step2.filter(lambda x: len(x) > 2)
     clean_baskets_step3.persist()
-    clean_baskets_step2.unpersist()
 
     # phase 1
     phase1_map = clean_baskets_step3.mapPartitions(
         lambda subset: A_priori_long_basket(subset, support, total_baskets_cnt, frequent_pairs_bc)).map(lambda x: (x, 1))
-    phase1_tmp = phase1_map.mapPartitions(lambda candidates: combiner(candidates))
-    phase1_tmp.persist()
-    phase1_reduce = phase1_tmp.reduceByKey(lambda x, y: 1).keys().collect()
-    phase1_tmp.unpersist()
+    phase1_reduce = phase1_map.mapPartitions(lambda candidates: combiner(candidates)).reduceByKey(lambda x, y: 1).keys().collect()
+    # phase1_reduce = phase1_map.reduceByKey(lambda x, y: 1).keys().collect()
 
     # phase 2: count candidate itemsets and filter out using support
+    start_phase2 = time()
     phase2_map = clean_baskets_step3.mapPartitions(lambda baskets_subset: candidate_count(baskets_subset, phase1_reduce))
     phase2_reduce = phase2_map.reduceByKey(lambda x, y: x + y).filter(lambda kv: kv[1] >= support).keys().collect()
+    end_phase2 = time()
+    part_duration = int(end_phase2 - start_phase2)
+    print(part_duration)
 
     # output to file
     with open(output_file, 'w') as f:
@@ -244,8 +245,8 @@ def run_all(minPartition):
 
 
 if __name__ == '__main__':
-    log_file = "./task2_local_log.txt"
-    numPartitions = [3, 4, 5, 6, 7, 10]
+    log_file = "./task2_local_log_part_duration.txt"
+    numPartitions = [3]
     duration_hist = []
 
     print("numPartition      duration")
@@ -259,4 +260,5 @@ if __name__ == '__main__':
     with open(log_file, 'w') as log_f:
         print("numPartition      duration", file=log_f)
         for i in range(len(numPartitions)):
-            print("    {0:2d}             {1:4d}s".format(numPartitions[i], duration_hist[i]), file=log_f)
+            print("    {0:2d}             {1:4d}s".format(numPartitions[i], duration_hist[i]),
+                  file=log_f)

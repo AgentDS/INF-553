@@ -14,17 +14,53 @@ from collections import Counter
 from itertools import combinations
 
 
-def get_customer_count(iterations):
-    for pair in iterations:
-        date_customer = pair[0].split('-')
-        yield (date_customer[1], 1)
-
-
-def emit_candidate_pairs(pairs, candidate_customers_bc):
+def date_customer_product_pair(pairs, candidate_customers_bc):
     for pair in pairs:
         date_customer = pair[0].split('-')
         if date_customer[1] in candidate_customers_bc.value:
             yield (pair[0], [pair[1]])
+
+
+def get_customer_product(iterations):
+    for pair in iterations:
+        date_customer = pair[0].split('-')
+        yield (date_customer[1], [pair[1]])
+
+
+def customer_filter(customer_infos, threshold=20):
+    for customer_info in customer_infos:
+        if len(set(customer_info[1])) > threshold:
+            yield customer_info[0]
+
+
+def partition_basket_cnt(baskets):
+    local_cnt = []
+    for basket in baskets:
+        local_cnt.append(len(basket))
+    yield local_cnt
+
+
+def count_singleton(baskets):
+    single_cnt = Counter()
+    baskets_cnt = 0
+    for basket in baskets:
+        single_cnt.update(basket)
+        baskets_cnt += 1
+    single_cnt = list(single_cnt.items())
+    for item in single_cnt:
+        yield item
+
+
+def count_pairs(baskets, singleton_bc):
+    pair_cnt = Counter()
+    current_pairs = []
+    for basket in baskets:
+        for pair in combinations(basket, 2):
+            current_pairs.append('_'.join(sorted(pair)))
+    pair_cnt.update(current_pairs)
+    pair_cnt = list(pair_cnt.items())
+    for item in pair_cnt:
+        yield item
 
 
 def extract_date_customer_product(iterator):
@@ -34,10 +70,21 @@ def extract_date_customer_product(iterator):
     return pairs
 
 
-def sort_into_file(reduce_result, tag, file=None):
+def combiner(candidates):
+    exist = []
+    for item in candidates:
+        if item[0] not in exist:
+            exist.append(item[0])
+            yield item
+
+
+def sort_into_file(frequent_singleton, frequent_pairs, reduce_result, tag, file=None):
+    inter_pairs = [i.split('_') for i in frequent_pairs]
     inter_result = [i.split('_') for i in reduce_result]
     max_size = max([len(i) for i in inter_result])
     candidate_itemsets = {i: [] for i in range(1, max_size + 1)}
+    [candidate_itemsets[1].append([i]) for i in frequent_singleton]
+    [candidate_itemsets[2].append(i) for i in inter_pairs]
     [candidate_itemsets[len(i)].append(i) for i in inter_result]
 
     for i in range(1, max_size + 1):
@@ -51,9 +98,9 @@ def sort_into_file(reduce_result, tag, file=None):
             set_cnt = len(itemsets)
             for j in range(set_cnt):
                 if j < set_cnt - 1:
-                    print("('%s')" % itemsets[j], end=",", file=file)
+                    print("('{0}')".format(itemsets[j][0]), end=",", file=file)
                 else:
-                    print("('%s')" % itemsets[j], file=file)
+                    print("('{0}')".format(itemsets[j][0]), file=file)
         else:
             set_cnt = len(itemsets)
             for j in range(set_cnt):
@@ -65,17 +112,7 @@ def sort_into_file(reduce_result, tag, file=None):
             print("", file=file)
 
 
-def candidate_count(baskets, candidate_itemsets):
-    itemsets_count = Counter()
-    baskets = list(baskets)
-    for basket in baskets:
-        for itemset in candidate_itemsets:
-            if all([item in basket for item in itemset.split('_')]):
-                itemsets_count.update([itemset])
-    return itemsets_count.items()
-
-
-def A_priori_long_basket(baskets, support, total_baskets_cnt):
+def A_priori_long_basket(baskets, support, total_baskets_cnt, frequent_pairs_bc):
     clean_baskets = list(baskets)
     local_support = support * len(clean_baskets) / float(total_baskets_cnt)
     baskets_cnt_ordered = sorted(Counter([len(basket) for basket in clean_baskets]).items(), reverse=True)
@@ -91,36 +128,11 @@ def A_priori_long_basket(baskets, support, total_baskets_cnt):
             continue
     candidate_itemsets = []
 
-    # frequent items
-    single_cnt = Counter()
-    for basket in clean_baskets:
-        single_cnt.update(basket)
-
-    candidate_single = sorted([i for i in single_cnt if single_cnt[i] >= local_support])
-    former_candidate = candidate_single
-    candidate_itemsets.extend(former_candidate)
-
-    # frequent pairs
-    itemset_cnt = Counter()
-    former_possible_items_set = former_candidate
-    for pair in combinations(former_possible_items_set, 2):
-        pair = sorted(pair)
-        for basket in clean_baskets:
-            contain_pair_flag = True
-            if len(basket) < 2:
-                continue
-            for item in pair:
-                if item not in basket:
-                    contain_pair_flag = False
-                    break
-            if contain_pair_flag:
-                itemset_cnt.update(['_'.join(pair)])
-    former_candidate = [i for i in itemset_cnt if itemset_cnt[i] >= local_support]
-    candidate_itemsets.extend(former_candidate)
-    if len(former_candidate) < 2:
-        return candidate_itemsets
+    former_candidate = frequent_pairs_bc.value
 
     # frequent itemsets with size >= 3
+    if max_itemset_size > 6:
+        max_itemset_size = 6
     for itemset_size in range(3, max_itemset_size + 1):
         itemset_cnt = Counter()
         possible_item_set = []
@@ -149,6 +161,16 @@ def A_priori_long_basket(baskets, support, total_baskets_cnt):
     return candidate_itemsets
 
 
+def candidate_count(baskets, candidate_itemsets):
+    itemsets_count = []
+    baskets = list(baskets)
+    for basket in baskets:
+        for itemset in candidate_itemsets:
+            if all([item in basket for item in itemset.split('_')]):
+                itemsets_count.append(itemset)
+    return Counter(itemsets_count).items()
+
+
 if __name__ == "__main__":
     argv = sys.argv
     filter_threshold = int(argv[1])
@@ -160,7 +182,7 @@ if __name__ == "__main__":
 
     # part 1: clean raw data file to (DATE-CUSTOMER_ID,PRODUCT_ID) pairs and write into file
     sc = SparkContext.getOrCreate()
-    raw_data = sc.textFile(input_file)
+    raw_data = sc.textFile(input_file, 3)
     header = raw_data.first()
     raw_data_without_header = raw_data.filter(lambda x: x != header)
     # "TRANSACTION_DT","CUSTOMER_ID","AGE_GROUP","PIN_CODE","PRODUCT_SUBCLASS","PRODUCT_ID","AMOUNT","ASSET","SALES_PRICE"
@@ -172,36 +194,52 @@ if __name__ == "__main__":
             print(pair[0] + ',' + '%d' % pair[1], file=out_f)
     sc.stop()
 
-    # part 2: SON
-    minPartition = 6
     sc = SparkContext.getOrCreate()
-    raw_data = sc.textFile(pair_out_file, minPartition)
+    raw_data = sc.textFile(pair_out_file, 3)
     header = raw_data.first()
     raw_data_without_header = raw_data.filter(lambda x: x != header)
     # DATE-CUSTOMER_ID,PRODUCT_ID
     clean_data = raw_data_without_header.mapPartitions(lambda x: csv.reader(x))
-    date_customer_pairs = clean_data.mapPartitions(lambda pairs: get_customer_count(pairs)).reduceByKey(lambda a, b: a + b)
-    candidate_customers = date_customer_pairs.filter(lambda x: x[1] > filter_threshold).map(lambda x: x[0]).collect()
+    candidate_customers = clean_data.mapPartitions(lambda pairs: get_customer_product(pairs)).reduceByKey(lambda a, b: a + b).mapPartitions(
+        lambda x: customer_filter(x, filter_threshold)).collect()
+
     candidate_customers_bc = sc.broadcast(candidate_customers)
-    baskets = clean_data.mapPartitions(lambda pairs: emit_candidate_pairs(pairs, candidate_customers_bc)).reduceByKey(lambda a, b: a + b)
-    clean_baskets = baskets.map(lambda x: sorted(list(set(list(x[1])))))
-    clean_baskets.persist()
-    total_baskets_cnt = clean_baskets.count()
+
+    clean_baskets_step1 = clean_data.mapPartitions(lambda pairs: date_customer_product_pair(pairs, candidate_customers_bc)).reduceByKey(
+        lambda a, b: a + b).map(lambda x: sorted(list(set(x[1]))))
+
+    clean_baskets_step1.persist()
+    total_baskets_cnt = clean_baskets_step1.count()
+
+    frequent_singleton = clean_baskets_step1.mapPartitions(lambda baskets: count_singleton(baskets)).reduceByKey(lambda a, b: a + b).filter(
+        lambda x: x[1] >= support).keys().collect()
+    singleton_bc = sc.broadcast(frequent_singleton)
+    clean_baskets_step2 = clean_baskets_step1.filter(lambda x: len(x) > 1)
+    clean_baskets_step2.persist()
+
+    frequent_pairs = clean_baskets_step2.mapPartitions(lambda baskets: count_pairs(baskets, singleton_bc)).reduceByKey(
+        lambda a, b: a + b).filter(lambda x: x[1] >= support).keys().collect()
+    frequent_pairs_bc = sc.broadcast(frequent_pairs)
+    clean_baskets_step3 = clean_baskets_step2.filter(lambda x: len(x) > 2)
+    clean_baskets_step3.persist()
 
     # phase 1
-    phase1_map = clean_baskets.mapPartitions(lambda subset: A_priori_long_basket(subset, support, total_baskets_cnt)).map(lambda x: (x, 1))
-    phase1_reduce = phase1_map.reduceByKey(lambda x, y: 1).keys().collect()
+    phase1_map = clean_baskets_step3.mapPartitions(
+        lambda subset: A_priori_long_basket(subset, support, total_baskets_cnt, frequent_pairs_bc)).map(lambda x: (x, 1))
+    phase1_reduce = phase1_map.mapPartitions(lambda candidates: combiner(candidates)).reduceByKey(lambda x, y: 1).keys().collect()
+    # phase1_reduce = phase1_map.reduceByKey(lambda x, y: 1).keys().collect()
 
-    # phase 2
-    phase2_map = clean_baskets.mapPartitions(lambda baskets_subset: candidate_count(baskets_subset, phase1_reduce))
+    # phase 2: count candidate itemsets and filter out using support
+    phase2_map = clean_baskets_step3.mapPartitions(lambda baskets_subset: candidate_count(baskets_subset, phase1_reduce))
     phase2_reduce = phase2_map.reduceByKey(lambda x, y: x + y).filter(lambda kv: kv[1] >= support).keys().collect()
 
     # output to file
     with open(output_file, 'w') as f:
-        sort_into_file(phase1_reduce, "Candidates:", f)
+        sort_into_file(frequent_singleton, frequent_pairs, phase1_reduce, "Candidates:", f)
         print("", file=f)
-        sort_into_file(phase2_reduce, "Frequent Itemsets:", f)
+        sort_into_file(frequent_singleton, frequent_pairs, phase2_reduce, "Frequent Itemsets:", f)
+
+    sc.stop()
 
     end = time()
-    sc.stop()
     print("Duration: %d" % int(end - start))
