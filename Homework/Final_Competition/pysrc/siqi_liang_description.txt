@@ -1,0 +1,15 @@
+Method Description:
+Hierarchical Ratings: Use weighted average rating on users as well as business, based on their own authority. Then combine them together using different weights again.
+
+Error Distribution:
+>=0 and <1: 96910
+>=1 and <2: 37451
+>=2 and <3: 7051
+>=3 and <4: 632
+>=4: 0
+
+RMSE:
+1.01913
+
+Execution Time:
+16s
