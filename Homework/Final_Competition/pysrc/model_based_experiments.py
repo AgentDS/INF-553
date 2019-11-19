@@ -160,7 +160,18 @@ if __name__ == "__main__":
         rmse_hist.append(rmse)
         duration_hist.append(duration)
         print("{0:d}                {1:3d}s             {2:.10f}".format(i, duration, rmse))
+    train_path = "/Users/liangsiqi/Documents/Dataset/inf553final_competition/yelp_train.csv"
+    test_path = "/Users/liangsiqi/Documents/Dataset/inf553final_competition/yelp_val.csv"
+    start = time()
+    model_based_CF(train_path, test_path, "/Users/liangsiqi/Documents/Dataset/inf553final_competition/" + "val_pred.csv")
+    end = time()
+    rmse = cal_RMSE("/Users/liangsiqi/Documents/Dataset/inf553final_competition/" + "val_pred.csv", test_path)
+    duration = int(end - start)
+    rmse_hist.append(rmse)
+    duration_hist.append(duration)
+    print("{0}                {1:3d}s             {2:.10f}".format('val', duration, rmse))
     with open(log_path, 'w') as log_f:
         print("train-val        duration         RMSE", file=log_f)
         for i in range(4):
             print("{0:d}                {1:3d}s             {2:.10f}".format(i, duration_hist[i], rmse_hist[i]), file=log_f)
+        print("{0:d}                {1:3d}s             {2:.10f}".format(4, duration_hist[4], rmse_hist[4]), file=log_f)
