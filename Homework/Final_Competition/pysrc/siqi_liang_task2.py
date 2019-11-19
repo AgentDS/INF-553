@@ -169,6 +169,11 @@ def user_based_predict(pairs, user_ratings_bc, business_ratings_bc, user_bidxs_b
             pred = sum(tmp) / len(tmp)
         else:
             pred = global_avg_bc.value
+        # lazy modification for prediction, rerange the prediction to [1, 5]
+        if pred < 1:
+            pred = 1
+        elif pred > 5:
+            pred = 5
         yield [user1, business, pred]
 
 
