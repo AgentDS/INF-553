@@ -3274,3 +3274,84 @@ __What is the meaning of $Ax$?__
   \bf{x}^T L \bf{x} = \sum_{(i,j)\in E}{(x_i - x_j)^2}
   $$
   
+
+
+
+
+
+
+
+## Week 12 - Link Analysis
+
+__Problem:__
+
+- Web as a directed graph
+
+  - Nodes: Webpages
+
+  - Edges: Hyperlinks
+
+  - Early web search:
+
+    - <u>Keywords extracted from web pages:</u> Use title and content to build __inverted index__
+
+    - <u>Queries are matched with web pages:</u> Via lookup in the inverted index; pages rank by __occurrences of query keywords__
+
+    - > __Problem:__ susceptible to __term spam__
+
+
+
+
+
+__Challenges of web search:__
+
+1. Web contains many sources of information
+2. What is the “best” answer to query “newspaper”?
+
+
+
+We will cover the following **Link Analysis approaches** for computing **importance** of nodes in a graph:
+
+- Page Rank
+- Topic-Specific (Personalized) Page Rank
+- Web Spam Detection Algorithms
+
+
+
+### PageRank: the "Flow" Formulation
+
+Calculate the probability that a random surfer lands on the page.
+
+Random surfer model more robust than manual approach: <u>A collective voting scheme</u>.
+
+
+
+__Graph:__
+
+- Nodes = pages
+- Edges = hyperlinks between pages
+
+
+
+__Extreme Case:__
+
+- <u>Dead end:</u> a page with no edges out
+  - Absorb PageRanks
+  - PageRank $\to$ 0 for any page that can reach the dead end (including the dead end itself)
+- <u>Spider Trap:</u> Group of pages with no edges going out of group
+  - Absorb all PageRanks
+  - Surfer can never leave, once trapped
+  - Can have $>1$  nodes
+
+
+
+#### Formulation Details
+
+- Links as votes: 
+  - page is more important if it has more links
+  - Links from important pages count more
+  - Recursive question:
+    - Each link's vote is proportional to the importance of its source page
+    - If page  $j$  with importance  $r_j$  has  $n$  out-links, each link gets  $r_j / n$  votes
+    - Page  $j$'s own importance is the sum of the votes on its in-links: $r_j = r_i/3 + r_k/4$
+
