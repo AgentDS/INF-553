@@ -200,13 +200,8 @@ if __name__ == "__main__":
     raw_data_without_header = raw_data.filter(lambda x: x != header)
     # DATE-CUSTOMER_ID,PRODUCT_ID
     clean_data = raw_data_without_header.mapPartitions(lambda x: csv.reader(x))
-    candidate_customers = clean_data.mapPartitions(lambda pairs: get_customer_product(pairs)).reduceByKey(lambda a, b: a + b).mapPartitions(
-        lambda x: customer_filter(x, filter_threshold)).collect()
-
-    candidate_customers_bc = sc.broadcast(candidate_customers)
-
-    clean_baskets_step1 = clean_data.mapPartitions(lambda pairs: date_customer_product_pair(pairs, candidate_customers_bc)).reduceByKey(
-        lambda a, b: a + b).map(lambda x: sorted(list(set(x[1]))))
+    clean_baskets_step1 = clean_data.map(lambda x: (x[0], [x[1]])).reduceByKey(lambda a, b: a + b).map(
+        lambda x: sorted(list(set(x[1])))).filter(lambda x: len(x) > filter_threshold)
 
     clean_baskets_step1.persist()
     total_baskets_cnt = clean_baskets_step1.count()

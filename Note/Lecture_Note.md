@@ -3355,3 +3355,124 @@ __Extreme Case:__
     - If page  $j$  with importance  $r_j$  has  $n$  out-links, each link gets  $r_j / n$  votes
     - Page  $j$'s own importance is the sum of the votes on its in-links: $r_j = r_i/3 + r_k/4$
 
+
+
+__The "flow" model:__
+
+- A "vote" from an important page is worth more
+
+- A page is important if it is pointed to by other important pages
+
+- Define a "rank"  $r_j$  for page  $j$:
+  $$
+  r_j = \sum_{i \to j}{\frac{r_i}{d_i}}
+  $$
+  where  $d_i$ is the out-degree of node  $i$
+
+
+
+#### Matrix Formulation
+
+- Stochastic Transition (or adjacency) Matrix  $M$
+- Suppose page  $j$  has  $n$  outlinks
+  - If outlink  $j \to i$, then  $M_{ij} = 1/n$
+  - Else  $M_{ij} = 0$  
+- $M$  is a column stochastic matrix
+  - Columns sum to 1
+- $M_{i,j} = $ Prob of going from node  $j$  to node  $i$
+  - if  $j$  has  $k$  out-going edges, prob for each edge  = $1/k$
+- Rank vector  $\bf{r}$  is a vector with one entry per web page
+  -  $r_i$  is the importance score of page  $i$
+- the flow equations can be writtern as  $\bf{r} = M \bf{r}$, which can be solved using __Power Iteration__ or __the principal eigenvector__
+
+
+
+#### Stationary Distribution
+
+- Limiting prob. distribution of random surfer
+  - PageRanks are based on limiting distribution
+  - the probability destruction will converge eventually
+- Requirement for its existence
+  - Graph is strongly connected: a node can reach any other node in the graph
+  - Cannot have dead ends, spider traps
+
+
+
+#### Power Iteration
+
+- Simple iterative scheme (relaxation)
+
+- suppose there are  $N$  web pages
+
+- Initialize: $r^0 = [1/N, \ldots, 1/N]^T$
+
+- Iterate: $\bf{r}^{k+1} = M \bf{r}^k$
+  $$
+  \bf{r}_j^{(t+1)} = \sum_{i\to j}{\frac{r_i^{(t)}}{d_i}}
+  $$
+
+- Stop when  $|\bf{r}^{k+1} - \bf{r}^k|_1 < \epsilon$
+
+
+
+
+
+#### Problems of PageRank
+
+1. Some pages are __dead ends__
+   - Random walk has “nowhere” to go to
+   - Such pages cause importance to “leak out”
+2. __Spider traps__
+   - Random walked gets "stuck" in a trap
+   - And eventually spider traps absorb all importance
+
+
+
+
+
+#### Solution for spider trap: Teleports
+
+- The Google solution for spider traps: At each time step, the random surfer has two options
+  - with prob $\beta$ follow a link at random
+  - with prob  $1-\beta$  jump to sum random page
+  - common value for $\beta$ are in the range  $0.8$  to  $0.9$
+- Surfer sill teleport out of spider trap within a few time steps
+- $\bf{r}^{k+1} = 0.8M \bf{r}^k + 0.2 Q \bf{r}^k$, where $\bf{Q}$ is a matrix each element of which is $1/N$, assuming there are $N$ nodes in the graph
+- For dead end problem modify the column for dead end node to be all $1/N$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

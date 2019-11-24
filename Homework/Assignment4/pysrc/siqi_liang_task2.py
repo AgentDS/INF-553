@@ -10,6 +10,7 @@ import csv
 from pyspark import SparkContext
 import copy
 from itertools import combinations
+import sys
 
 
 def vertex_combiner(vertexes):
@@ -24,7 +25,7 @@ def BFS_travel(root_node, vert_neighbors, vert_list):
 
     current_level = [root_node]
 
-    while len(vert_list) > 0:
+    while True:
         next_level = []
         for current_node in current_level:
             vert_list.remove(current_node)
@@ -40,6 +41,8 @@ def BFS_travel(root_node, vert_neighbors, vert_list):
                 in_degree[node].append(current_node)
                 out_degree[current_node].append(node)
         current_level = list(set(next_level))
+        if len(current_level) == 0:
+            break
     return in_degree, out_degree
 
 
@@ -154,11 +157,11 @@ def graph_modularity(node_community, m, original_vert_neighbors_num, current_ver
 
 
 if __name__ == "__main__":
-    input_file = "/Users/liangsiqi/Desktop/INF-553/Homework/Assignment4/data/power_input.txt"
-    output_file = "./tmp_local_task2_betweenness.txt"
-    community_output_file_path = "./tmp_local_task2_communities.txt"
-    # input_file = "./small_graph.txt"
-    # output_file = "./tmp_betweenness.txt"
+    argv = sys.argv
+    input_file = argv[1]
+    betweenness_output_file_path = argv[2]
+    community_output_file_path = argv[3]
+
     sc = SparkContext.getOrCreate()
     raw_data = sc.textFile(input_file, 5)
     edge_pairs = raw_data.mapPartitions(lambda x: csv.reader(x, delimiter=' '))
@@ -173,7 +176,7 @@ if __name__ == "__main__":
         lambda node_subset: emit_edges_for_each_node(node_subset, vertex_neighbors, all_vertexes)).reduceByKey(
         lambda a, b: a + b).mapValues(lambda x: x / 2).mapPartitions(lambda edges: emit_node_pair_betweenness(edges)).sortBy(
         lambda x: [-x[1], x[0][0]]).collect()
-    write_into_file(output_file, edge_info)
+    write_into_file(betweenness_output_file_path, edge_info)
     m = len(edge_info)
     original_vertex_neighbors = copy.deepcopy(vertex_neighbors)
     original_vertex_neighbors_num = {i: len(original_vertex_neighbors[i]) for i in original_vertex_neighbors}
@@ -181,15 +184,15 @@ if __name__ == "__main__":
     old_modularity = 0  # the original modularity is 1.77097130
 
     while True:
-        print("Current community number:", old_community_num)
+        # print("Current community number:", old_community_num)
+        if old_community_num == 18:
+            break
         while True:
             # take the edge with the maximum betweenness
             node1, node2 = vertexes.mapPartitions(
                 lambda node_subset: emit_edges_for_each_node(node_subset, vertex_neighbors, all_vertexes)).reduceByKey(
                 lambda a, b: a + b).mapPartitions(lambda edges: emit_node_pair_betweenness(edges)).sortBy(
                 lambda x: [-x[1], x[0][0]]).take(1)[0][0]
-            print(node1, node2)
-            # node1, node2 = max_betweenness_edge
             # remove edge from neighbor list
             vertex_neighbors[node1].remove(node2)
             vertex_neighbors[node2].remove(node1)
@@ -199,14 +202,11 @@ if __name__ == "__main__":
                 break
         old_community_num = len(node_community)
         modularity = graph_modularity(node_community, m, original_vertex_neighbors_num, vertex_neighbors)
-        if modularity < old_modularity:
-            break
-        else:
-            old_modularity = modularity
+
     final_communities = [sorted(i) for i in node_community.values()]
     sorted_communities = sorted(final_communities, key=lambda x: [len(x), x[0]])
     with open(community_output_file_path, 'w') as out_f:
         for com in sorted_communities:
-            line = ', '.join(com)
+            new_com = ["'%s'" % i for i in com]
+            line = ', '.join(new_com)
             print(line, file=out_f)
-            print("\n\n", file=out_f)
