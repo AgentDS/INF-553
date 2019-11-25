@@ -3688,12 +3688,235 @@ __Obvious solution:__ hash table
 
 - A Bloom filter placed on the stream of URL’s will declare that **certain URL’s have been seen before**
 - Others will be declared new, and will be added to the list of URL's that need to be crawled
-- Unfortunately, the Bloom
+- Unfortunately, the Bloom can have __false positives__
+  - it can declare a URL has been seen before when it hasn't
+  - but if it says "never seen", then it is truly new (no false negative)
+
+
+
+#### How a Bloom Filter Works
+
+- A ***Bloom filter*** is an array of bits, together with a number of **hash functions**
+- The argument of each hash function is a**stream element**, and it returns a **position** in the array
+- Initially, all bits are 0
+- When input  $x$  arrives, we set to 1 the bits  $h(x)$  for each hash function  $h$
+
+__Example:__
+
+<img src="./pic/bloomfilter0.png" height="250px">
+
+#### Bloom Filter Lookup
+
+- Suppose element **y appears** in the stream, and we want to know **if we have seen y before**
+- **Compute h(y)** for each hash function y
+- If all the resulting **bit positions are 1**, say we have **seen y before** **(false positive)**
+- If at least one of these **positions is 0**, say we have **not seen y before** **(true negative)**
+
+
+
+#### Performance of Bloom Filters
+
+- Probability of a false positive depends on the density of 1's in the array and the number of hash functions: $=(\text{fraction of 1's})^{\text{# of hash functions}}$
+- $\text{# of 1’s} \approx \text{# of elements inserted} \times \text{# of hash functions}$
+  - but collisions lower that number slightly
+
+
+
+##### Throwing Darts
+
+We have  $d$  darts, $t$  targets. 
+
+- Probability a given target is hit by a given dart $=1/t$
+- Probability non of  $d$  darts hit a given target is $= (1-1/t)^d$
+- Probability that a target gets at least one dart $=1-(1-1/t)^{d}$
+  - when  $t$  is large enough, $1-(1-1/t)^{d} = 1-(1-1/t)^{t\cdot d/t} \approx 1 - e^{-d/t}$
+- where  $d = \text{# of bits}$,  $t = \text{# of hash functions} \times \text{# of inserted elements}$
 
 
 
 
+
+> __Example__
+>
+> Suppose we use an array of 1 billion bits**, **5 hash functions, and we insert 100 million elements.
+>
+> - $t = 10^9$,  $d=5\times 10^8$
+> - the fraction of 0's that remain will be  $e^{1/2} = 0.607$
+> - density of 1's $= 1 - 0.607 = 0.393$
+> - Probability of a false positive $= (0.393)^5 = 0.00937$ 
 
 
 
 ### Sampling Streams
+
+Since **we can not store the entire stream**, one obvious approach is to store a **sample**.
+
+Two different problems:
+
+1. Sample a fixed proportion of elements in the stream
+2. maintain a random sample of fixed size over a potentially infinite stream
+
+
+
+
+
+#### Sampling a fixed proportionScenario: Search engine query stream
+
+__Scenario:__
+
+- Stream of tuples: (user, query, time)
+- have space to store 1/10 of query stream
+
+
+
+__Naive solution:__
+
+- Generate a **random integer** in **[0..9]** for each query
+- Store the query if the integer is **0**, otherwise discard
+
+
+
+__Example:__ Unique search queries
+
+
+
+__Problem with naive approach:__ we sampled based on the **position**in the stream, rather than **the value of the stream element**
+
+
+
+__Solution:__
+
+1. Pick **1/10** of **users** and take all their searches in the sample
+2. Use a hash function that hashes theuser name or user id uniformly into 10 buckets.
+
+
+
+__Generalized Solution:__
+
+- Stream of tuples with keys:
+  - Key is some subset of each tuple’s components
+    - e.g., tuple is (user, search, time); key is **user**
+  - Choice of key depends on application
+- To get a sample of  a/b  fraction of the stream:
+  - Hash each tuple’s key uniformly into ***b*** buckets
+  - Pick the tuple if its hash value is at most ***a***
+
+
+
+#### Sampling a fixed- size sample
+
+As the stream grows, the sample is of fixed size.
+
+If we fix the proportion of sample from the stream, as the stream grows, the 10% sample will also be  too big.
+
+__Idea:__ throw away some queries.
+
+__Key:__ do this consistently
+
+- remove all or none of occurrences of a query
+
+
+
+Put an upper bound on the sample size:
+
+- Start out with $10\%$
+- Hash queries to a large # of buckets, say 100
+  - Take for the sample those elements hashing to buckets 0 through 9
+- When sample grows too big, throw away bucket 9
+- Still too big, get rid of 8, and so on
+
+
+
+<img src="./pic/fixedSize.png" height="300px">
+
+
+
+### Counting Distinct Element: Flajolet-Martin
+
+#### Problem
+
+- Data stream consists of a **universe of elements** chosen from a set of size ***N***
+- Maintain a count of the number of distinct elements seen so far
+
+
+
+__Obvious approach:__
+
+Maintain the set of elements seen so far.
+
+- That is, keep a **hash table** of all the distinct elements seen so far.
+
+
+
+**Estimate the count in an unbiased way.**
+
+**Accept that the count may have a little error, but limit the probability that the error is large.**
+
+
+
+#### Flajolet-Martin algorithm
+
+Estimating the counts
+
+- Pick a hash function  $h$  that maps each of the  $n$  elements to at least  $\log_2{n}$  bits
+- For each stream element  $a$, let  $r(a)$  be the number of trailing 0's in  $h(a)$
+- Maintain  $R=$ the maximum  $r(a)$ (e.g., $R=2$)
+- Estimate = $2^R$
+
+
+
+##### why it works? Intuition
+
+-  $h(a)$  hashes  $a$  with equal prob to any of  $N$  values
+- Then  $h(a)$  is a sequence of  $\log_2{N}$  bits
+- the probability that a given  $h(a)$  ends in at least  $i$  0's is  $2^{-i}$
+- if there are  $m$  different elements, the probability that  $R \ge i$  is  $1 - (1-2^{-i})^m$
+- since  $2^{-i}$  is small,  $1-(1-2^{-i})^m = (1-2^{-i})^{2^i (m 2^{-i})} \approx 1 - e^{-m 2^{-i}} = 1 - e^{-\frac{m}{2^i}}$ 
+  - if  $2^i \gg m$, $p = 1 -  e^{-\frac{m}{2^i}} \approx 1 - (1 - \frac{m}{2^i}) = \frac{m}{2^{i}} \approx 0$
+  - if  $2^i \ll m$, $p = 1 - 1/e^{\frac{m}{2^i}} \to 1$
+
+**Thus, $2^i$ will almost always be around** $m$.
+
+
+
+##### Why it doesn't work
+
+- $E(2^R)$  is infinite
+- Workaround involves using **many hash functions** $h_i$ and getting **many samples of** $R_i$
+- How to combine samples  $R_i$?
+- **Average?** What if one very large value $2^{R_i}$ ?
+- **Median?** All estimates are a power of 2
+
+
+
+##### Solution
+
+- Partition your samples into small groups
+  - $\log{n}$, where n=size of universal set, suffices
+- Take the average of groups
+- Then take the median of the averages
+- the result is the unbiased estimate
+
+
+
+
+
+### Estimating Moments: AMS method
+
+
+
+
+
+### Summary
+
+- DBMS vs Stream Management
+- Stream data processing and type of queries
+- Counting the number of 1s in the last  $N$  elements
+  - Exponentially increasing windows
+  - Extensions:
+    - Number of 1s in any last  $k$  elements $(k < N)$
+    - Sums of integers in the last  $N$  elements
+- Sampling data from a stream
+  - Method 1: sample a fixed portion of elements
+  - Method 2: maintain a fixed-size sample
+- Filtering a data stream: Bloom filters
