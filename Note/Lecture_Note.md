@@ -3442,6 +3442,253 @@ __The "flow" model:__
 
 
 
+## Week13 - Mining Data Streams
+
+### Basic Concept
+
+__Data stream:__
+
+1. the entire set of data is unknown in advance
+2. Stream management is important when the inpu is controlled externally
+3. the data is infinite and non-stationary (the distribution changes over time)
+
+
+
+__the Stream Model:__
+
+1. Input elements enter at a rapid rate, at one or more input ports
+   - we cake elements of the stream tuples: __(user, query, time)__
+2. the system cannot store the entire stream accessibly
+
+
+
+__Stream data and Data Base Management system:__
+
+- Stream of tuples arriving at a rapid rate
+  - in contrast to traditional DBMS where all tuples are stored in secondary storage
+- Infeasible to use all tuples to answer queries
+  - Cannot __store__ them all in main memory
+  - too much __computation__
+  - query __response time__ critical
+
+
+
+__Forms of Query:__
+
+1. __Standing queries:__
+   - Executed whenever a new tuple arrives
+   - e.g., report each new maximum value ever seen in the stream
+2. __Ad-hoc queries:__
+   - Normal queries asked one time about streams
+   - e.g., what is the maximum value so far?
+
+
+
+> __Example:__ Running averages
+>
+> Given a window of size $N$
+>
+> - Report the average of values in the window whenever a value arrives
+> - $N$ is so large that we cannot store all tuples in the window
+>
+> 
+>
+> Solution:
+>
+> - first $N$ inputs, accumulated sum and count: $Avg = sum/count$
+> - a new element $i$
+>   - Change the average by adding  $(i-j)/N$
+>   - $j$  is the oldest element in the window
+
+
+
+#### Problems on Data Streams
+
+- Types of queries one wants on answer on a data stream
+  - Queries over sliding windows
+  - Sampling data from a stream
+  - Filtering a data stream
+  - Counting distinct elements
+  - Estimating moments
+  - Finding frequent elements
+
+
+
+#### Applications
+
+- Mining query streams
+- Mining click streams
+- Mining social network news feeds
+
+
+
+#### Sliding Windows
+
+- A useful model of stream processing is that queries are about a ***window*** of length ***N*** – the ***N*** **most recent elements received**
+- __Interesting case:__ $N$ is so large that the data cannot be stored in memory, or even on disk
+  - Or, there are so many streams that windows for all cannot be stored
+
+
+
+### Counting Bits
+
+#### Problem
+
+- Given a stream of 0s and 1s
+- Be prepared to answer queries of the form "how many1s are in the last _k_ bits?" Where  $k\le N$
+
+
+
+__Obvious solution:__ Store the most recent $N$ bits
+
+- When new bit comes in, discard the $N+1^{st}$ bit
+- But answering the query will take  $O(k)$  time
+  - Possibly too much time
+- the space requirements can be too great
+  - Especially if there are many streams to be managed in <u>main memory at once</u>, or  $N$  is huge
+
+
+
+__We are happy with an approximate answer.__
+
+#### Simple Solution
+
+Maintain 2 counters:
+
+- $S$: number of 1s from the beginning of the stream
+- $Z$: number of 0s from the beginning of the stream
+- Then there are $N \cdot \frac{S}{S+Z}$
+- <u>what if distribution changes over time????</u>
+
+
+
+#### DGIM Method
+
+__Advantage:__
+
+- Store  $O(\log^2{N})$  bits per stream
+  - $O(\log{N})$  counts of  $\log_2{N}$  bits each
+- Does not assume uniformity
+- Esay update as more bits enter
+- Error in count no greater than the number of 1s in the "unknown" area
+
+
+
+__Disadvantage:__
+
+- As long as the **1s** are fairly evenly distributed, the error due to the unknown region is small – **no more than 50%**
+- But it could be that **all the 1s are in the unknown area** at the end. In that case, the error is unbounded
+
+
+
+##### Fixup
+
+- **Idea:** Instead of summarizing fixed-length blocks, summarize blocks with specific number of **1s**:
+  - Let the block __sizes__ (number of 1s) increase exponentially
+- **When there are few 1s in the window, block sizes stay small, so errors are small**
+
+
+
+##### Timestamps
+
+- Each bit in the stream has a ***timestamp***, starting 1,2, ...
+- Record timestamps modulo N (the window size), so we can represent any relevant timestamp in  $O(\log_2{N})$  bits
+- Store  $O(\log^2{N})$ bits per stream 
+
+
+
+##### Buckets
+
+A ***bucket*** in the DGIM method is a record consisting of:
+
+- the timestamp of its end: $O(\log{N})$  bits
+- the number of 1s between its beginning and end: $O(\log{\log{N}})$  bits
+  - number of 1's = size of the bucket
+
+
+
+Constraint on buckets: number of 1's must be a power of 2:
+
+- this explains the $O(\log{\log{N}})$
+
+
+
+##### Representing a Stream by Buckets
+
+- Either **one** or **two** buckets with the same **power-of-2 number** of **1s**
+- Buckets do not overlap in timestamps
+- Buckets are sorted by size
+  - Earlier buckets are not smaller than later buckets
+- Buckets disappear when their end-time is > N time units in the past
+
+
+
+##### Updating Buckets
+
+- When a **new bit comes in**, **drop the last (oldest) bucket** if its **end-time is prior to** ***N***time units before the current time
+- if the current bit is 0: no other changes are needed
+- if the current bit is 1:
+  1. create a new bucket of size 1, for just this bit: end timestamp = current time
+  2. if there are now three buckets of size 1, combine the oldest two into a bucket of size 2
+  3. if there are now three buckets of soze 2, combine the oldest two into a bucket into a bucket of size 4
+  4. and so on ...
+
+
+
+##### How to Query?
+
+- to estimate the number of 1's in the most recent  $k \le N$  bits:
+
+  1. Restrict your attention to only those buckets whose end time stamp is at most  $k$  bits in past
+  2. Sum the sizes of all these buckets but the oldest
+  3. Add half the size of the oldest bucket
+
+  > __Remember:__ We do not know how many **1s**of the last bucket are still within the wanted window.
+
+
+
+##### Error Bound
+
+- suppose the last bucket has size $2^i$
+- Then by assuming  $2^{i-1}$  of its 1's are still within the window, we make an error of at most  $2^{i-1}$
+- Since there is at least one bucket of each of the sizes less than  $2^i$, and at least 1 from the oldest bucket, the true sum is no less than  $2^i$: $2^{i-1} + 2^{i-2} + \cdots + 2^1 + 2^0 = 2^i - 1$
+- thus the error at most  $50\%$
+
+
+
+#### Further Reducing the Error
+
+- Instead of maintaining **1** or **2** of each size bucket, we ($i> 2$) **allow either $i-1$ or $i$ buckets**
+  - Except for the largest size buckets; we can have any number between **1** and  $i$  of those
+- Error is at most  $O(1/i)$
+- by picking  $i$  appropriately, we can tradeoff between number of bits we store and the error
+
+
+
+
+
+### Bloom Filters
+
+__Problem:__ Given a stream of URLs, filter out those URLs who have been seen before and append the unseen URL to the list for later web crawler.
+
+__Obvious solution:__ hash table
+
+- if we don't have enough memory to store all of  $S$  in a hash table
+
+
+
+#### Applications
+
+- __Email spam filtering:__ we know 1 billion "good" email addresses; if an email comes rom one of these, it is NOT spam
+- __Publish-suscribe systems:__ you are collecting lots of messages (news articles); people express interest in certain sets of keywords; determined whether each message matches user's interest
+
+
+
+#### Role of the Bloom Filter
+
+- A Bloom filter placed on the stream of URL’s will declare that **certain URL’s have been seen before**
+- Others will be declared new, and will be added to the list of URL's that need to be crawled
+- Unfortunately, the Bloom
 
 
 
@@ -3449,30 +3696,4 @@ __The "flow" model:__
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+### Sampling Streams
