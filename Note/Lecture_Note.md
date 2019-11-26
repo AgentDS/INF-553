@@ -3903,7 +3903,81 @@ Estimating the counts
 
 ### Estimating Moments: AMS method
 
+- Suppose a stream has elements chosen from a set  $A$  of  $N$  values
+- Let  $m_i$  be the number of times value  $i$  occurs in the stream
+- the  $k^{th}$  __moment__ is  $\sum_{i\in A}{(m_i)^k}$
 
+
+
+<img src="./pic/moment.png" height="200px">
+
+#### AMS Method
+
+- AMS method works for all moments
+- Gives an unbiased estimate
+- We will just concentrate on the 2nd moment $S$
+- We pick and keep track of many variables $X$:
+  - For each variable  $X$
+  - ``X.element`` :  element in  $X$
+  - ``X.value`` : \# of occurrences of X from time  $t$  to  $n$
+  - Note this requires a count in main memory, so number of ***X***s is limited
+- __Our goal is to compute__  $S = \sum_i{m_i^2}$
+
+
+
+##### One Random Variable (X)
+
+- Assume stream has **length** ***n***
+- Pick a random **time** to start, so that any time is equally likely
+- Let the chosen time have element ***a*** in the stream
+- $f(X) = n \times(2\cdot \text{# of $a$'s in the stream starting at the choson time}-1)$
+  - __store $n$ once, count of $a$'s for each $X$__
+
+
+
+##### Expectation Analysis
+
+- $2^{nd}$  Moment is $S = \sum_i{m_i^2}$
+- $E[f(X)] = \frac{1}{n} \sum_{t=1}^n{n\cdot n^*}$, where $n^*$ is  $(2\cdot \text{# of $a$'s in the stream starting at the choson time} - 1)$
+- $c_t, \cdots$  number of times item at time  $t$  appears from time  $t$  onwards ($c_1 = m_a$, $c_2 = m_a - 1$, $c_3 = m_b$) 
+- $E[f(X)] = \frac{1}{n} \sum_{t=1}^n{n(2 c_t - 1)} = \sum_a{(1+3+5+\ldots + 2 m_a - 1)} = \sum_a(m_a)^2$
+- So $E[f(X)] = \sum_i{(m_i)^2} = S$
+
+
+
+#### Higher-Order Moments
+
+- For estimating $k^{th}$ moment we essentially use the same algorithm but change the estimate:
+
+  - For **k=2** we used $n (2\cdot c – 1)$
+
+  - For **k=3** we use: $n (3\cdot c^2 – 3c + 1)$ (where **c=X.val**)
+
+  - __Why?__
+
+    <img src="./pic/moment1.png" height="100px">
+
+- Generally: Estimate = $n(c^k - (c-1)^k)$
+
+
+
+#### Combining Samples
+
+- **In practice:**
+  - Compute 𝒇(𝑿) = 𝒏(𝟐 𝒄 – 𝟏) for as many variables ***X*** as you can fit in memory
+  - Average them in groups
+  - take median of averages
+- **Problem: Streams never end**
+  - We assumed there was a number ***n***, the number of positions in the stream
+  - But real **streams go on forever**, so ***n*** is a variable – the number of inputs seen so far.
+- __Fixups:__
+  1. The variables ***X*** have ***n*** as a factor – keep ***n*** separately; just hold the count in ***X***
+  2. Supposewecanonly **store k counts**. We must throw some ***X***s out as time goes on:
+     - **Objective:** Each starting time ***t*** is selected with probability **k/n**
+     - **Solution: (fixed-size sampling!)**
+       - Choose the first ***k*** times for ***k*** variables
+       - When the  $n^{th}$ element arrives (***n*** **>** ***k***), choose it with probability __k/n__
+       - If you choose it, throw one of the previously stored variables **X** out, with equal probability.
 
 
 
