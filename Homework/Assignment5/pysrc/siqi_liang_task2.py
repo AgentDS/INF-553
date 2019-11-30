@@ -35,14 +35,16 @@ def zero_trail_num(hash_values):
     for v in hash_values:
         bin_v = bin(v)
         zero_nums.append(len(bin_v) - len(bin_v.rstrip('0')))
+    return zero_nums
 
 
 def find_median(x):
     n = len(x)
     x = sorted(x)
     if n % 2 == 0:
-        median1 = x[n // 2]
-        median2 = x[n // 2 - 1]
+        # print("len of x: ", n)
+        median1 = x[int(n / 2)]
+        median2 = x[int(n / 2) - 1]
         median = (median1 + median2) / 2
     else:
         median = x[n // 2]
@@ -51,13 +53,17 @@ def find_median(x):
 
 def average_median_R(R_powers, group_num):
     num_each_group = int(len(R_powers) / group_num)
+    # print("num_each_group:", num_each_group)
     medians = []
     for i in range(group_num):
-        start_idx = group_num * num_each_group
-        end_idx = (group_num + 1) * num_each_group
+        start_idx = i * num_each_group
+        end_idx = (i + 1) * num_each_group
         within_group = R_powers[start_idx:end_idx]
+        # print("R_power: ", R_powers)
+        # print("len of within group: ", len(within_group))
+        # print(R_powers[start_idx:end_idx])
         medians.append(find_median(within_group))
-    return sum(medians) / len(medians)
+    return int(sum(medians) / len(medians))
 
 
 def median_average_R(R_powers, group_num):
@@ -68,14 +74,11 @@ def median_average_R(R_powers, group_num):
         end_idx = (group_num + 1) * num_each_group
         within_group = R_powers[start_idx:end_idx]
         avgs.append(sum(within_group) / num_each_group)
-    return find_median(avgs)
+    return int(find_median(avgs))
 
 
 def process_stream(rdd):
     cities_within_window = rdd.collect()
-    hash_num_each_group = 6
-    hash_group = 4
-    m = 400
     max_zero_num = [0 for i in range(hash_num_each_group * hash_group)]
     a_values, b_values = hash_maker(hash_num_each_group * hash_group, m)
 
@@ -89,41 +92,38 @@ def process_stream(rdd):
 
     R_power_values = [2 ** i for i in max_zero_num]
     estimate = average_median_R(R_power_values, hash_group)
+    ground_truth = len(set(cities_within_window))
 
-    print(len(set(city)))
-    print(len(set(city)))
-    print(len(set(city)))
-    print(len(set(city)))
-    print(len(set(city)))
-    print(len(set(city)))
-    print(len(set(city)))
-    print(len(set(city)))
-    print(len(set(city)))
-    print(len(set(city)))
+    estimate_hist.append(estimate)
+    ground_truth_hist.append(ground_truth)
+    timestamp_hist.append(int(time()))
 
 
 if __name__ == "__main__":
-    # argv = sys.argv
-    # port_num = int(argv[1])
-    # output_filename = argv[2]
+    argv = sys.argv
+    port_num = int(argv[1])
+    output_filename = argv[2]
 
     random.seed(0)
-    unique_states = set()
-    global_counter = Counter()
+    hash_num_each_group = 6
+    hash_group = 5
+    m = 400
+    timestamp_hist = []
+    ground_truth_hist = []
+    estimate_hist = []
 
     sc = SparkContext.getOrCreate()
     ssc = StreamingContext(sc, 5)
-    lines = ssc.socketTextStream("localhost", 9999)
+    lines = ssc.socketTextStream("localhost", port_num)
     state_stream = lines.transform(lambda rdd: rdd.map(json.loads).map(lambda x: x['city']))
-    # state_stream.foreachRDD(process_stream)
     city_window = state_stream.window(30, 10)
     city_window.foreachRDD(lambda rdd: process_stream(rdd))
 
     ssc.start()
-    ssc.awaitTermination()
+    ssc.awaitTermination(605)
     ssc.stop()
 
-    # with open(output_filename, 'w') as out_f:
-    #     print("Time,Ground Truth,Estimation", file=out_f)
-    #     for i in range(len(fpr_hist)):
-    #         print("{0},{1}".format(datetime.fromtimestamp(timestamp_hist[i]), fpr_hist[i]), file=out_f)
+    with open(output_filename, 'w') as out_f:
+        print("Time,Ground Truth,Estimation", file=out_f)
+        for i in range(len(estimate_hist)):
+            print("{0},{1},{2}".format(datetime.fromtimestamp(timestamp_hist[i]), ground_truth_hist[i], estimate_hist[i]), file=out_f)
