@@ -105,9 +105,9 @@ if __name__ == "__main__":
     output_filename = argv[2]
 
     random.seed(0)
-    hash_num_each_group = 6
-    hash_group = 5
-    m = 400
+    hash_num_each_group = 8
+    hash_group = 16
+    m = 401
     timestamp_hist = []
     ground_truth_hist = []
     estimate_hist = []
