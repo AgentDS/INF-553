@@ -89,7 +89,7 @@ class MyStreamListener(tweepy.StreamListener):
             MyStreamListener.tag_hist[tag] += 1
 
     def _sort_tag_hist_print(self):
-        top_tags = sorted(list(MyStreamListener.tag_hist.items()), key=lambda x: [-x[1], x[0]])[:10]
+        top_tags = sorted(list(MyStreamListener.tag_hist.items()), key=lambda x: [-x[1], x[0]])[:5]
         for tag in top_tags:
             print("{0} : {1}".format(tag[0], tag[1]))
         print('')

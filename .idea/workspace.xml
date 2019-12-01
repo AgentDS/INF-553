@@ -2,17 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3048757c-7701-4810-8801-4ca61ec32eae" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment1/scala_version/siqi_liang_hw1/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment1/scala_version/siqi_liang_hw1/src/main/scala/com/siqi_liang_hw1/App.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment1/scala_version/siqi_liang_hw1/src/test/scala/samples/junit.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment1/scala_version/siqi_liang_hw1/src/test/scala/samples/scalatest.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment1/scala_version/siqi_liang_hw1/src/test/scala/samples/specs.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment1/scala_version/src/main/scala/siqi_liang_task1.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment1/scala_version/src/main/scala/siqi_liang_task2.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment1/scala_version/src/main/scala/siqi_liang_task3.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment2/pysrc/.ipynb_checkpoints/task1-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Assignment2/pysrc/.ipynb_checkpoints/task1-checkpoint.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment2/pysrc/task1.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Assignment2/pysrc/task1.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Note/Lecture_Note.md" beforeDir="false" afterPath="$PROJECT_DIR$/Note/Lecture_Note.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Assignment5/pysrc/siqi_liang_task3.py" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Assignment5/pysrc/siqi_liang_task3.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -31,6 +22,7 @@
   </component>
   <component name="ProjectId" id="1Qox38RU6BWR9qVBAwTocfZQaOP" />
   <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RunDashboard">
@@ -55,8 +47,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1568617520985</updated>
+      <workItem from="1575170663511" duration="15000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
