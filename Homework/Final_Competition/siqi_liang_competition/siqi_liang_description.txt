@@ -1,15 +1,15 @@
 Method Description:
-Hierarchical Ratings: Use weighted average rating on users as well as business, based on their own authority. Then combine them together using different weights again.
+global Benchmark: Use global weighted average rating on users as well as business, based on their own authority. Both user.json and business.json are used to generate user_features.csv and business_features.csv for later model. Then combine them together using different weights again.
 
 Error Distribution:
->=0 and <1: 96910
->=1 and <2: 37451
->=2 and <3: 7051
->=3 and <4: 632
+>=0 and <1: 97892
+>=1 and <2: 36978
+>=2 and <3: 6682
+>=3 and <4: 492
 >=4: 0
 
 RMSE:
-1.01913
+1.00212
 
 Execution Time:
-16s
+42s

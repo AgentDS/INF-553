@@ -11,6 +11,8 @@ from pyspark import SparkContext, SparkConf
 import csv
 from time import time
 
+from siqi_liang_utils import cal_RMSE, error_distribution, write_predict
+
 
 def emit_pairs_user_base(lines, uid2idx_bc, bid2idx_bc):
     for line in lines:
@@ -164,80 +166,7 @@ def global_AVG_method(train_file_path, test_file_path, output_file_path, numPart
                                   global_avg_bc)).mapPartitions(
         lambda lines: emit_id_pairs_user_base(lines, uidx2id_bc, bidx2id_bc)).collect()
     sc.stop()
-    with open(output_file_path, 'w') as out_f:
-        print("user_id, business_id, prediction", file=out_f)
-        for line in test_pred_id_pairs:
-            print(line, file=out_f)
-
-
-def cal_RMSE(output_file_path, test_file_path):
-    conf = SparkConf().set('spark.driver.host', '127.0.0.1')
-    sc = SparkContext(master='local', appName='myAppName', conf=conf)
-    raws = []
-    with open(output_file_path, 'r') as f:
-        csv_reader = csv.reader(f, delimiter=',')
-        line_count = 0
-        for row in csv_reader:
-            if line_count == 0:
-                line_count += 1
-            else:
-                raws.append([row[0] + ',' + row[1], float(row[2])])
-    predict_val_pair = sc.parallelize(raws)
-
-    raws = []
-    with open(test_file_path, 'r') as f:
-        csv_reader = csv.reader(f, delimiter=',')
-        line_count = 0
-        for row in csv_reader:
-            if line_count == 0:
-                line_count += 1
-            else:
-                raws.append([row[0] + ',' + row[1], float(row[2])])
-    ground_val_pair = sc.parallelize(raws)
-
-    val_RMSE = (ground_val_pair.join(predict_val_pair).map(lambda x: (x[1][0] - x[1][1]) ** 2).mean()) ** 0.5
-    sc.stop()
-    return val_RMSE
-
-
-def error_distribution(output_file_path, test_file_path):
-    conf = SparkConf().set('spark.driver.host', '127.0.0.1')
-    sc = SparkContext(master='local', appName='myAppName', conf=conf)
-    raws = []
-    with open(output_file_path, 'r') as f:
-        csv_reader = csv.reader(f, delimiter=',')
-        line_count = 0
-        for row in csv_reader:
-            if line_count == 0:
-                line_count += 1
-            else:
-                raws.append([row[0] + ',' + row[1], float(row[2])])
-    predict_val_pair = sc.parallelize(raws)
-
-    raws = []
-    with open(test_file_path, 'r') as f:
-        csv_reader = csv.reader(f, delimiter=',')
-        line_count = 0
-        for row in csv_reader:
-            if line_count == 0:
-                line_count += 1
-            else:
-                raws.append([row[0] + ',' + row[1], float(row[2])])
-    ground_val_pair = sc.parallelize(raws)
-    err_dict = ground_val_pair.join(predict_val_pair).map(lambda x: abs(x[1][0] - x[1][1])).map(lambda x: (int(x), 1)).reduceByKey(
-        lambda a, b: a + b).collectAsMap()
-    for i in range(5):
-        if i != 4:
-            if i in err_dict:
-                print(">=%d and <%d: %d" % (i, i + 1, err_dict[i]))
-            else:
-                print(">=%d and <%d: %d" % (i, i + 1, 0))
-        else:
-            if i in err_dict:
-                print(">=4: %d" % err_dict[i])
-            else:
-                print(">=4: 0")
-    sc.stop()
+    write_predict(test_pred_id_pairs, output_file_path)
 
 
 if __name__ == "__main__":

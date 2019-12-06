@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/INF-553.iml" filepath="$PROJECT_DIR$/.idea/INF-553.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Angle-Closure/ML_AAP_Siqi/.idea/ML_AAP_Siqi.iml" filepath="$PROJECT_DIR$/../Angle-Closure/ML_AAP_Siqi/.idea/ML_AAP_Siqi.iml" />
     </modules>
   </component>
 </project>

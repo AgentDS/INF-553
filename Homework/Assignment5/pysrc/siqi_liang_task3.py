@@ -73,7 +73,7 @@ class MyStreamListener(tweepy.StreamListener):
                     MyStreamListener.tweet_buffer.append(status.text)
                     self._add_tags(tags_to_add)
 
-            print("The number of tweets with tags from the beginning: ", MyStreamListener.total_cnt)
+            print("The number of tweets with tags from the beginning: %d" % MyStreamListener.total_cnt)
             self._sort_tag_hist_print()
 
     def _delete_tage(self, tags_to_adopt):
@@ -96,10 +96,6 @@ class MyStreamListener(tweepy.StreamListener):
 
 
 if __name__ == "__main__":
-    argv = sys.argv
-    # port_num = int(argv[1])
-    # output_filename = argv[2]
-
     consumer_key = 'IAlRSjkeynP1LFzgE5XGDjoZ2'
     consumer_secret = 'ny6LDWzeWh3nAzg5G0gVYDCSYXr43S9o13fC6YJulrYqJS4w8z'
     access_token = '974302581383086081-BTfVnhhQmUhVLRcJZ4oPjQ8tz2QZVVX'

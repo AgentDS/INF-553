@@ -31,8 +31,9 @@ def hash_maker(hash_num, m):
     return a_values, b_values
 
 
-def process_stream(rdd):
+def process_stream(rdd, file):
     stream = rdd.collect()
+    global_counter = Counter()
     for state in stream:
         int_state = int(binascii.hexlify(state.encode('utf8')), 16)
         hash_value = [(int_state * a + b) % bit_array_len for a, b in zip(a_values, b_values)]
@@ -51,9 +52,11 @@ def process_stream(rdd):
         if int_state not in unique_states and already_appear_pred:
             global_counter.update(['FP'])
         unique_states.add(int_state)
-    fpr = global_counter['FP'] / (global_counter['FP'] + global_counter['TN'])
-    fpr_hist.append(fpr)
-    timestamp_hist.append(int(time()))
+    if global_counter['FP'] + global_counter['TN'] == 0:
+        fpr = 0
+    else:
+        fpr = global_counter['FP'] / (global_counter['FP'] + global_counter['TN'])
+    print("{0},{1}".format(datetime.fromtimestamp(int(time())), fpr), file=file)
 
 
 if __name__ == "__main__":
@@ -64,26 +67,20 @@ if __name__ == "__main__":
     unique_states = set()
     bit_array_len = 200
     hash_num = 6
-    global_counter = Counter()
     a_values, b_values = hash_maker(hash_num, bit_array_len)
     global_bit_array = [False for _ in range(bit_array_len)]
-    fpr_hist = []
-    timestamp_hist = []
-
-    sc = SparkContext.getOrCreate()
-    ssc = StreamingContext(sc, 10)
-    lines = ssc.socketTextStream("localhost", port_num)
-    state_stream = lines.transform(lambda rdd: rdd.map(json.loads).map(lambda x: x['state']))
-    state_stream.foreachRDD(lambda rdd: process_stream(rdd))
-
-    ssc.start()
-    # try:
-    #     ssc.awaitTermination()
-    # except:
-    ssc.awaitTermination(610)
-    ssc.stop()
 
     with open(output_filename, 'w') as out_f:
         print("Time,FPR", file=out_f)
-        for i in range(len(fpr_hist)):
-            print("{0},{1}".format(datetime.fromtimestamp(timestamp_hist[i]), fpr_hist[i]), file=out_f)
+        sc = SparkContext.getOrCreate()
+        ssc = StreamingContext(sc, 10)
+        lines = ssc.socketTextStream("localhost", port_num)
+        state_stream = lines.transform(lambda rdd: rdd.map(json.loads).map(lambda x: x['state']))
+        state_stream.foreachRDD(lambda rdd: process_stream(rdd, out_f))
+
+        ssc.start()
+        # try:
+        #     ssc.awaitTermination()
+        # except:
+        ssc.awaitTermination()
+        ssc.stop()

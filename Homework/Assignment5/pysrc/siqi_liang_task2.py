@@ -77,7 +77,7 @@ def median_average_R(R_powers, group_num):
     return int(find_median(avgs))
 
 
-def process_stream(rdd):
+def process_stream(rdd, file):
     cities_within_window = rdd.collect()
     max_zero_num = [0 for i in range(hash_num_each_group * hash_group)]
     a_values, b_values = hash_maker(hash_num_each_group * hash_group, m)
@@ -94,9 +94,7 @@ def process_stream(rdd):
     estimate = average_median_R(R_power_values, hash_group)
     ground_truth = len(set(cities_within_window))
 
-    estimate_hist.append(estimate)
-    ground_truth_hist.append(ground_truth)
-    timestamp_hist.append(int(time()))
+    print("{0},{1},{2}".format(datetime.fromtimestamp(int(time())), ground_truth, estimate), file=file)
 
 
 if __name__ == "__main__":
@@ -112,18 +110,15 @@ if __name__ == "__main__":
     ground_truth_hist = []
     estimate_hist = []
 
-    sc = SparkContext.getOrCreate()
-    ssc = StreamingContext(sc, 5)
-    lines = ssc.socketTextStream("localhost", port_num)
-    state_stream = lines.transform(lambda rdd: rdd.map(json.loads).map(lambda x: x['city']))
-    city_window = state_stream.window(30, 10)
-    city_window.foreachRDD(lambda rdd: process_stream(rdd))
-
-    ssc.start()
-    ssc.awaitTermination(605)
-    ssc.stop()
-
     with open(output_filename, 'w') as out_f:
         print("Time,Ground Truth,Estimation", file=out_f)
-        for i in range(len(estimate_hist)):
-            print("{0},{1},{2}".format(datetime.fromtimestamp(timestamp_hist[i]), ground_truth_hist[i], estimate_hist[i]), file=out_f)
+        sc = SparkContext.getOrCreate()
+        ssc = StreamingContext(sc, 5)
+        lines = ssc.socketTextStream("localhost", port_num)
+        state_stream = lines.transform(lambda rdd: rdd.map(json.loads).map(lambda x: x['city']))
+        city_window = state_stream.window(30, 10)
+        city_window.foreachRDD(lambda rdd: process_stream(rdd, out_f))
+
+        ssc.start()
+        ssc.awaitTermination()
+        ssc.stop()
