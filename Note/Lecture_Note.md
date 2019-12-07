@@ -3449,7 +3449,7 @@ __The "flow" model:__
 __Data stream:__
 
 1. the entire set of data is unknown in advance
-2. Stream management is important when the inpu is controlled externally
+2. Stream management is important when the input is controlled externally
 3. the data is infinite and non-stationary (the distribution changes over time)
 
 
@@ -3697,7 +3697,7 @@ __Obvious solution:__ hash table
 #### How a Bloom Filter Works
 
 - A ***Bloom filter*** is an array of bits, together with a number of **hash functions**
-- The argument of each hash function is a**stream element**, and it returns a **position** in the array
+- The argument of each hash function is a **stream element**, and it returns a **position** in the array
 - Initially, all bits are 0
 - When input  $x$  arrives, we set to 1 the bits  $h(x)$  for each hash function  $h$
 
@@ -3741,7 +3741,7 @@ We have  $d$  darts, $t$  targets.
 > Suppose we use an array of 1 billion bits**, **5 hash functions, and we insert 100 million elements.
 >
 > - $t = 10^9$,  $d=5\times 10^8$
-> - the fraction of 0's that remain will be  $e^{1/2} = 0.607$
+> - the fraction of 0's that remain will be  $e^{-1/2} = 0.607$
 > - density of 1's $= 1 - 0.607 = 0.393$
 > - Probability of a false positive $= (0.393)^5 = 0.00937$ 
 
@@ -3760,7 +3760,7 @@ Two different problems:
 
 
 
-#### Sampling a fixed proportionScenario: Search engine query stream
+#### Sampling a fixed proportion Scenario: Search engine query stream
 
 __Scenario:__
 
@@ -3780,7 +3780,7 @@ __Example:__ Unique search queries
 
 
 
-__Problem with naive approach:__ we sampled based on the **position**in the stream, rather than **the value of the stream element**
+__Problem with naive approach:__ we sampled based on the **position** in the stream, rather than **the value of the stream element**
 
 
 

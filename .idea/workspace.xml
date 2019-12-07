@@ -2,28 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3048757c-7701-4810-8801-4ca61ec32eae" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/siqi_liang_DecisionTree.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/siqi_liang_globalBenchmark.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/siqi_liang_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/INF-553.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/INF-553.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment2/pysrc/local_task2.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment5/pysrc/local_task1_out.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Assignment5/pysrc/local_task1_out.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment5/pysrc/siqi_liang_task1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Assignment5/pysrc/siqi_liang_task1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment5/pysrc/siqi_liang_task2.py" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Assignment5/pysrc/siqi_liang_task2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment5/pysrc/siqi_liang_task3.py" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Assignment5/pysrc/siqi_liang_task3.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment5/pysrc/task1.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Assignment5/pysrc/task1.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment5/pysrc/task2_local.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Assignment5/pysrc/task2_local.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Assignment5/pysrc/task3.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Assignment5/pysrc/task3.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/.ipynb_checkpoints/Untitled-checkpoint.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/Untitled.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/local_avg_val_pred.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/local_avg_val_pred.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/siqi_liang_HierarchicalWeight.py" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/siqi_liang_HierarchicalWeight.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/siqi_liang_competition.py" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/siqi_liang_competition.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/siqi_liang_competition/siqi_liang_HierarchicalWeight.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/siqi_liang_competition/siqi_liang_competition.py" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Final_Competition/siqi_liang_competition/siqi_liang_competition.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/siqi_liang_competition/siqi_liang_description.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Final_Competition/siqi_liang_competition/siqi_liang_description.txt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -80,7 +59,7 @@
       <workItem from="1575319367390" duration="7386000" />
       <workItem from="1575402403074" duration="1256000" />
       <workItem from="1575499179203" duration="254000" />
-      <workItem from="1575591252913" duration="1526000" />
+      <workItem from="1575591252913" duration="1754000" />
     </task>
     <servers />
   </component>
