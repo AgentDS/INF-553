@@ -252,6 +252,17 @@ Now run Scala in the terminal:![scala](./Note/pic/scala.png)
 
 ### Homework Details
 
+|            | Setting                                | Duration Benchmark (sec)       | Local Duration (sec)                      | Result Benchmark | Local   Result                                        |
+| ---------- | -------------------------------------- | ------------------------------ | ----------------------------------------- | ---------------- | ----------------------------------------------------- |
+| HW2 Task 1 | Case1: Support=4<br />Case2: Support=9 | Case1: <=200<br />Case2: <=100 | Case1: 7<br />Case2: 8                    |                  |                                                       |
+| HW2 Task 2 | Filter Threshold=20<br />Support=50    | <=500                          | 17                                        |                  |                                                       |
+| HW3 Task1  | Jaccard similarity                     |                                | 12.40                                     |                  | Recall=0.99<br />Precision=1.0                        |
+| HW3 Task2  |                                        | Model-Based: <br />User-Based: | Model-Based: 17.60<br />User-Based: 13.06 |                  | Model-Based RMSE: 1.066<br />User-Based RMSE: 1.16981 |
+| HW5        |                                        |                                |                                           |                  |                                                       |
+|            |                                        |                                |                                           |                  |                                                       |
+
+
+
 - HW1
 
   - Task 1: use ``user.json``
@@ -305,7 +316,7 @@ Now run Scala in the terminal:![scala](./Note/pic/scala.png)
 
   - Task2: Collaborative filtering
 
-    Detail and tips see [implementation description file](./Homework/Assignment3/INF553_HW3_siqi_liang_description.pdf)
+    Detail and tips see [implementation description file](./INF553_HW3_siqi_liang_description.pdf)
     
   - Model-based
     - User-based
