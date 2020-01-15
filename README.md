@@ -277,7 +277,7 @@ Now run Scala in the terminal:![scala](./Note/pic/scala.png)
     - Then delete all baskets with ``size=1`` or ``size=2`` (delete around 16000 such baskets), which helps to speed up for later steps
     - using A-priori only to find candidate itemset with ``size>=3``
 
-    - use ``A_priori_long_basket()``, local test shows ``minPartition=3`` works better. Local test takes around 217 seconds.
+    - use ``A_priori_long_basket()``, local test shows ``minPartition=3`` works better. Local test takes around 17 seconds.
 
 - HW3
 
