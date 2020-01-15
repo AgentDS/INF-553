@@ -252,14 +252,14 @@ Now run Scala in the terminal:![scala](./Note/pic/scala.png)
 
 ### Homework Details
 
-|            | Setting                                | Duration Benchmark (sec)       | Local Duration (sec)                      | Result Benchmark | Local   Result                                        |
-| ---------- | -------------------------------------- | ------------------------------ | ----------------------------------------- | ---------------- | ----------------------------------------------------- |
-| HW2 Task 1 | Case1: Support=4<br />Case2: Support=9 | Case1: <=200<br />Case2: <=100 | Case1: 7<br />Case2: 8                    |                  |                                                       |
-| HW2 Task 2 | Filter Threshold=20<br />Support=50    | <=500                          | 17                                        |                  |                                                       |
-| HW3 Task1  | Jaccard similarity                     |                                | 12.40                                     |                  | Recall=0.99<br />Precision=1.0                        |
-| HW3 Task2  |                                        | Model-Based: <br />User-Based: | Model-Based: 17.60<br />User-Based: 13.06 |                  | Model-Based RMSE: 1.066<br />User-Based RMSE: 1.16981 |
-| HW5        |                                        |                                |                                           |                  |                                                       |
-|            |                                        |                                |                                           |                  |                                                       |
+|            | Setting                                | Duration Benchmark (sec)                 | Local Duration (sec)                | Result Benchmark                                  | Local   Result                                     |
+| ---------- | -------------------------------------- | ---------------------------------------- | ----------------------------------- | ------------------------------------------------- | -------------------------------------------------- |
+| HW2 Task 1 | Case1: Support=4<br />Case2: Support=9 | Case1: <=200<br />Case2: <=100           | Case1: 7<br />Case2: 8              |                                                   |                                                    |
+| HW2 Task 2 | Filter Threshold=20<br />Support=50    | <=500                                    | 17                                  |                                                   |                                                    |
+| HW3 Task1  | Jaccard similarity                     | <=120                                    | 12                                  |                                                   | Recall=0.99<br />Precision=1.0                     |
+| HW3 Task2  |                                        | Model-Based: <=50<br />User-Based: <=180 | Model-Based: 17<br />User-Based: 13 | Model-Based RMSE: 1.30<br />User-Based RMSE: 1.18 | Model-Based RMSE: 1.066<br />User-Based RMSE: 1.09 |
+| HW5        |                                        |                                          |                                     |                                                   |                                                    |
+|            |                                        |                                          |                                     |                                                   |                                                    |
 
 
 
@@ -319,7 +319,10 @@ Now run Scala in the terminal:![scala](./Note/pic/scala.png)
     Detail and tips see [implementation description file](./INF553_HW3_siqi_liang_description.pdf)
     
   - Model-based
-    - User-based
+    
+  - User-based
+    
+    - __Use global average when calculating similarity rather than co-rated item average!!!!!__ (Lower RMSE in this case)
     
     > - ``statistics.mean(list)`` is slower than ``sum(list)/len(list)``!!!!!! After replacing ``statistics.mean()`` with ``sum(list)/len(list)``, local user-based test time is around 70s (150s before replacement)
     > - It seems if we use user_avg as the prediction for all pairs, RMSE<1.07 on ``yelp_test.csv``__?!?!?!?!?!?!?!?!!?__ 
