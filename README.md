@@ -15,7 +15,7 @@ INF-553 2019 fall, by Prof. Anna Farzindar
 - Lec7: Recommender System 1 & 2
 - Lec8: Recommender System 3 & 4
 - Lec9: Social Networks 1
-- Lect10: Social Networks 2 & Clustering
+- Lec10: Social Networks 2 & Clustering
 - Lec11: Link Analysis
 - Lec12: Mining Data Streams
 
