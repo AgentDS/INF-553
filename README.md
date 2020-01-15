@@ -252,14 +252,14 @@ Now run Scala in the terminal:![scala](./Note/pic/scala.png)
 
 ### Homework Details
 
-|            | Setting                                | Duration Benchmark (sec)                 | Local Duration (sec)                | Result Benchmark                                  | Local   Result                                     |
-| ---------- | -------------------------------------- | ---------------------------------------- | ----------------------------------- | ------------------------------------------------- | -------------------------------------------------- |
-| HW2 Task 1 | Case1: Support=4<br />Case2: Support=9 | Case1: <=200<br />Case2: <=100           | Case1: 7<br />Case2: 8              |                                                   |                                                    |
-| HW2 Task 2 | Filter Threshold=20<br />Support=50    | <=500                                    | 17                                  |                                                   |                                                    |
-| HW3 Task1  | Jaccard similarity                     | <=120                                    | 12                                  |                                                   | Recall=0.99<br />Precision=1.0                     |
-| HW3 Task2  |                                        | Model-Based: <=50<br />User-Based: <=180 | Model-Based: 17<br />User-Based: 13 | Model-Based RMSE: 1.30<br />User-Based RMSE: 1.18 | Model-Based RMSE: 1.066<br />User-Based RMSE: 1.09 |
-| HW5        |                                        |                                          |                                     |                                                   |                                                    |
-|            |                                        |                                          |                                     |                                                   |                                                    |
+|            | Setting                                        | Duration Benchmark (sec)                 | Local Duration (sec)                | Result Benchmark                                  | Local   Result                                     |
+| ---------- | ---------------------------------------------- | ---------------------------------------- | ----------------------------------- | ------------------------------------------------- | -------------------------------------------------- |
+| HW2 Task 1 | Case1: Support=4<br />Case2: Support=9         | Case1: <=200<br />Case2: <=100           | Case1: 7<br />Case2: 8              |                                                   |                                                    |
+| HW2 Task 2 | Filter Threshold=20<br />Support=50            | <=500                                    | 17                                  |                                                   |                                                    |
+| HW3 Task1  | Jaccard similarity                             | <=120                                    | 12                                  | Recall>=0.95<br />Precision=1.0                   | Recall=0.99<br />Precision=1.0                     |
+| HW3 Task2  | Model-Based: rank=3, lambda=0.2, iterations=15 | Model-Based: <=50<br />User-Based: <=180 | Model-Based: 17<br />User-Based: 13 | Model-Based RMSE: 1.30<br />User-Based RMSE: 1.18 | Model-Based RMSE: 1.066<br />User-Based RMSE: 1.09 |
+| HW4 Task1  |                                                | <=500                                    | 210                                 |                                                   |                                                    |
+| HW4 Task2  |                                                | <=500                                    | (Unrecorded)                        |                                                   |                                                    |
 
 
 
