@@ -2,6 +2,8 @@
 
 INF-553 2019 fall, by Prof. Anna Farzindar
 
+> __The code for homework is not allowed to published, so only tips for homework were published. Hope these will help you.__
+
 [TOC]
 
 ## Basic Course Information
