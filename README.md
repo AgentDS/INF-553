@@ -6,9 +6,18 @@ INF-553 2019 fall, by Prof. Anna Farzindar
 
 ## Basic Course Information
 
-
-
-- Lec1: Introduction & MapReduce1
+- Lec1: Introduction & Large-Scale File System & MapReduce1
+- Lec2: MapReduce2 & 3
+- Lec3: Find Frequent Itemsets 1
+- Lec4: Frequent Items 2 & 3
+- Lec5: Find Similar Sets 1 & 2
+- Lec6: Find Similar Sets 3
+- Lec7: Recommender System 1 & 2
+- Lec8: Recommender System 3 & 4
+- Lec9: Social Networks 1
+- Lect10: Social Networks 2 & Clustering
+- Lec11: Link Analysis
+- Lec12: Mining Data Streams
 
 
 
@@ -263,91 +272,90 @@ Now run Scala in the terminal:![scala](./Note/pic/scala.png)
 
 
 
-- HW1
+#### HW1
 
-  - Task 1: use ``user.json``
+- Task 1: use ``user.json``
 
-    
+- Task 2: use ``user.json``
+- Task 3: use ``review.json`` and ``business.json``
 
-  - Task 2: use ``user.json``
 
-  - Task 3: use ``review.json`` and ``business.json``
 
-  - 
+#### HW2
 
-- HW2
+- Task 1: use A-Priori & SON algorithm to find all possible frequent itemsets
+  - for ``small2.csv`` case 1 with ``support=4``, local test shows ``minPartition=3``, ``A_priori_short_basket()`` works better. Local test takes 7 seconds. 
+  - for ``small1.csv`` case 2 with ``support=9``, local test shows ``minPartition=2``, ``A_priori_long_basket()`` works better. Local test takes 8 seconds. 
+  - ``A_priori_long_basket()`` optimizes the process of generating itemset size  $k+1$  from itemset size  $k$
+  
+- Task 2: 
 
-  - Task 1: use A-Priori & SON algorithm to find all possible frequent itemsets
-    - for ``small2.csv`` case 1 with ``support=4``, local test shows ``minPartition=3``, ``A_priori_short_basket()`` works better. Local test takes 7 seconds. 
-    - for ``small1.csv`` case 2 with ``support=9``, local test shows ``minPartition=2``, ``A_priori_long_basket()`` works better. Local test takes 8 seconds. 
-    - ``A_priori_long_basket()`` optimizes the process of generating itemset size  $k+1$  from itemset size  $k$
-    
-  - Task 2: 
+  - collect frequent singleton as well as frequent pairs using brute-force (emit all possible singletons/pairs in each basket, then filter using ``support``)
+  - Then delete all baskets with ``size=1`` or ``size=2`` (delete around 16000 such baskets), which helps to speed up for later steps
+  - using A-priori only to find candidate itemset with ``size>=3``
 
-    - collect frequent singleton as well as frequent pairs using brute-force (emit all possible singletons/pairs in each basket, then filter using ``support``)
-    - Then delete all baskets with ``size=1`` or ``size=2`` (delete around 16000 such baskets), which helps to speed up for later steps
-    - using A-priori only to find candidate itemset with ``size>=3``
+  - use ``A_priori_long_basket()``, local test shows ``minPartition=3`` works better. Local test takes around 17 seconds.
 
-    - use ``A_priori_long_basket()``, local test shows ``minPartition=3`` works better. Local test takes around 17 seconds.
+#### HW3
 
-- HW3
+- Task1: min-hash & LSH to find similar business_id pars
 
-  - Task1: min-hash & LSH to find similar business_id pars
+  - Jaccard similarity: 
 
-    - Jaccard similarity: 
+    - Use ``mapPartitions()`` instead of ``.map()`` for most ``RDD`` operations to speed up
 
-      - Use ``mapPartitions()`` instead of ``.map()`` for most ``RDD`` operations to speed up
+    - local test shows optimal ``numPartitions=5`` using ``sc.parallelize()`` to load input file (sometimes ``parallelize()`` is not large enough to load input file), with 
 
-      - local test shows optimal ``numPartitions=5`` using ``sc.parallelize()`` to load input file (sometimes ``parallelize()`` is not large enough to load input file), with 
+      - pure computation time <u>8 seconds</u> for the whole process (``load data``$\to$``min-hash``$\to$``LSH``$\to$``compute similarty``$\to$``write result``), 
 
-        - pure computation time <u>8 seconds</u> for the whole process (``load data``$\to$``min-hash``$\to$``LSH``$\to$``compute similarty``$\to$``write result``), 
+      - <u>script running time 12.4 seconds</u> (use ``time spark-submit script.py``, cpu time)
 
-        - <u>script running time 12.4 seconds</u> (use ``time spark-submit script.py``, cpu time)
+      - <u>precision=1.0</u>, 
 
-        - <u>precision=1.0</u>, 
+      - <u>recall=0.99</u>.
 
-        - <u>recall=0.99</u>.
+    - local ``numPartitoins``-``data load method`` experiment results in [task1 experiment log file](./Homework/Assignment3/pysrc/experiment_time.txt)  ([experiment script](./Homework/Assignment3/pysrc/task1_local_experiment.py))
 
-      - local ``numPartitoins``-``data load method`` experiment results in [task1 experiment log file](./Homework/Assignment3/pysrc/experiment_time.txt)  ([experiment script](./Homework/Assignment3/pysrc/task1_local_experiment.py))
+    - Question: ``sc.textFile()`` with  customized ``minPartitions`` works similar to ``sc.parallelize()`` with customized ``numPartitions``, so what's the difference? (not clear after searching on Google)
 
-      - Question: ``sc.textFile()`` with  customized ``minPartitions`` works similar to ``sc.parallelize()`` with customized ``numPartitions``, so what's the difference? (not clear after searching on Google)
+  - Cosine similarity: optional, not implemented
 
-    - Cosine similarity: optional, not implemented
+- Task2: Collaborative filtering
 
-  - Task2: Collaborative filtering
+  Detail and tips see [implementation description file](./INF553_HW3_siqi_liang_description.pdf)
+  
+- Model-based
+  
+- User-based
+  
+  - __Use global average when calculating similarity rather than co-rated item average!!!!!__ (Lower RMSE in this case)
+  
+  > - ``statistics.mean(list)`` is slower than ``sum(list)/len(list)``!!!!!! After replacing ``statistics.mean()`` with ``sum(list)/len(list)``, local user-based test time is around 70s (150s before replacement)
+  > - It seems if we use user_avg as the prediction for all pairs, RMSE<1.07 on ``yelp_test.csv``__?!?!?!?!?!?!?!?!!?__ 
+  > - 
 
-    Detail and tips see [implementation description file](./INF553_HW3_siqi_liang_description.pdf)
-    
-  - Model-based
-    
-  - User-based
-    
-    - __Use global average when calculating similarity rather than co-rated item average!!!!!__ (Lower RMSE in this case)
-    
-    > - ``statistics.mean(list)`` is slower than ``sum(list)/len(list)``!!!!!! After replacing ``statistics.mean()`` with ``sum(list)/len(list)``, local user-based test time is around 70s (150s before replacement)
-    > - It seems if we use user_avg as the prediction for all pairs, RMSE<1.07 on ``yelp_test.csv``__?!?!?!?!?!?!?!?!!?__ 
-    > - 
 
-- HW4
 
-- HW5
+#### HW4
 
-- Final Competition
+#### HW5
 
-  |                    | Submission 1                                                 | Submission 2                                                 | Submission 3                                                 |
-  | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-  | Val RMSE           | 1.019139997                                                  | 1.002121513                                                  | 0.9807033701                                                 |
-  | Test RMSE          | 1.015982788                                                  | 1.000238924                                                  | 0.9793494612                                                 |
-  | Val Duration       | 16s                                                          | 42s                                                          | 241s                                                         |
-  | Method             | Use weighted average rating on users as well as business. Then combine them together using 1:1 weights again. | Use global average rating on users as well as business. Then combine them together using 1:1 weights again. | Both user.json and business.json are used to generate user_features.csv and business_features.csv for later model. Then use business features 'business_star', 'latitude', 'longitude', 'business_review_cnt', and user features; 'user_review_cnt', 'useful', 'cool', 'funny', 'fans', 'user_avg_star' to train the Gradient Boosting model. |
-  | Error (>=0 and <1) | 96910                                                        | 97892                                                        | 102013                                                       |
-  | Error (>=1 and <2) | 37451                                                        | 36978                                                        | 32998                                                        |
-  | Error (>=2 and <3) | 7051                                                         | 6682                                                         | 6229                                                         |
-  | Error (>=3 and <4) | 632                                                          | 492                                                          | 804                                                          |
-  | Error (>=4)        | 0                                                            | 0                                                            | 0                                                            |
+#### Final Competition
 
-  - Top 3 test RMSE in the class:
-    - 0.9750778569
-    - 0.9773295973
-    - 0.9784191539
+|                    | Submission 1                                                 | Submission 2                                                 | Submission 3                                                 |
+| ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Val RMSE           | 1.019139997                                                  | 1.002121513                                                  | 0.9807033701                                                 |
+| Test RMSE          | 1.015982788                                                  | 1.000238924                                                  | 0.9793494612                                                 |
+| Val Duration       | 16s                                                          | 42s                                                          | 241s                                                         |
+| Method             | Use weighted average rating on users as well as business. Then combine them together using 1:1 weights again. | Use global average rating on users as well as business. Then combine them together using 1:1 weights again. | Both user.json and business.json are used to generate user_features.csv and business_features.csv for later model. Then use business features 'business_star', 'latitude', 'longitude', 'business_review_cnt', and user features; 'user_review_cnt', 'useful', 'cool', 'funny', 'fans', 'user_avg_star' to train the Gradient Boosting model. |
+| Error (>=0 and <1) | 96910                                                        | 97892                                                        | 102013                                                       |
+| Error (>=1 and <2) | 37451                                                        | 36978                                                        | 32998                                                        |
+| Error (>=2 and <3) | 7051                                                         | 6682                                                         | 6229                                                         |
+| Error (>=3 and <4) | 632                                                          | 492                                                          | 804                                                          |
+| Error (>=4)        | 0                                                            | 0                                                            | 0                                                            |
+
+- Top 3 test RMSE in the class:
+  - 0.9750778569
+  - 0.9773295973
+  - 0.9784191539
 
