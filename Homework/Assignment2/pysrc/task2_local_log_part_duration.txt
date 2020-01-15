@@ -1,2 +1,0 @@
-numPartition      duration
-     3              213s

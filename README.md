@@ -316,3 +316,24 @@ Now run Scala in the terminal:![scala](./Note/pic/scala.png)
 
 - HW4
 
+- HW5
+
+- Final Competition
+
+  |                    | Submission 1                                                 | Submission 2                                                 | Submission 3                                                 |
+  | ------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+  | Val RMSE           | 1.019139997                                                  | 1.002121513                                                  | 0.9807033701                                                 |
+  | Test RMSE          | 1.015982788                                                  | 1.000238924                                                  | 0.9793494612                                                 |
+  | Val Duration       | 16s                                                          | 42s                                                          | 241s                                                         |
+  | Method             | Use weighted average rating on users as well as business. Then combine them together using 1:1 weights again. | Use global average rating on users as well as business. Then combine them together using 1:1 weights again. | Both user.json and business.json are used to generate user_features.csv and business_features.csv for later model. Then use business features 'business_star', 'latitude', 'longitude', 'business_review_cnt', and user features; 'user_review_cnt', 'useful', 'cool', 'funny', 'fans', 'user_avg_star' to train the Gradient Boosting model. |
+  | Error (>=0 and <1) | 96910                                                        | 97892                                                        | 102013                                                       |
+  | Error (>=1 and <2) | 37451                                                        | 36978                                                        | 32998                                                        |
+  | Error (>=2 and <3) | 7051                                                         | 6682                                                         | 6229                                                         |
+  | Error (>=3 and <4) | 632                                                          | 492                                                          | 804                                                          |
+  | Error (>=4)        | 0                                                            | 0                                                            | 0                                                            |
+
+  - Top 3 test RMSE in the class:
+    - 0.9750778569
+    - 0.9773295973
+    - 0.9784191539
+

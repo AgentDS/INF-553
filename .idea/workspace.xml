@@ -2,7 +2,59 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3048757c-7701-4810-8801-4ca61ec32eae" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment1/frequency.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment1/happiest_state.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment1/top_ten.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_a.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_a.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_b.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_b.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_c.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_c.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_d.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_d.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_e.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_e.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_f.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_f.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_g.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_g.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_h.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_h.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_i.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment2/part_i.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment3/asymmetric_friendships.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment3/friend_count.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment3/inverted_index.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment3/join.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment3/multiply.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment3/unique_trims.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/siqi_liang_GradientBoosting.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/siqi_liang_ex.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/siqi_liang_modelBased.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment1/term_sentiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment1/term_sentiment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment1/tweet_sentiment.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment1/tweet_sentiment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment1/twitterstream.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment1/twitterstream.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment3/wordcount.py" beforeDir="false" afterPath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment3/wordcount.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/INF-553.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/INF-553.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Assignment4/pysrc/siqi_liang_task2.py" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Assignment4/pysrc/siqi_liang_task2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Assignment4/pysrc/task2.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Assignment4/pysrc/task2.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Assignment4/pysrc/tmp_local_task2_betweenness.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Assignment4/pysrc/tmp_local_task2_betweenness.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Assignment4/pysrc/tmp_local_task2_communities.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Assignment4/pysrc/tmp_local_task2_communities.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/data_exploring.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/data_exploring.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/data_split.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/data_split.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/decisionTree_ex.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/decisionTree_ex.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/result_check.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/result_check.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/siqi_liang_competition.py" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/siqi_liang_competition.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/siqi_liang_model_based.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/siqi_liang_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Final_Competition/pysrc/siqi_liang_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/siqi_liang_competition/siqi_liang_competition.py" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Final_Competition/siqi_liang_competition/siqi_liang_competition.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/siqi_liang_competition/siqi_liang_description.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Final_Competition/siqi_liang_competition/siqi_liang_description.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/siqi_liang_competition/siqi_liang_globalBenchmark.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Homework/Final_Competition/siqi_liang_competition/siqi_liang_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/Homework/Final_Competition/siqi_liang_competition/siqi_liang_utils.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -16,17 +68,19 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="SQL File" />
         <option value="Python Script" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials" />
   </component>
   <component name="ProjectCodeStyleSettingsMigration">
     <option name="version" value="1" />
   </component>
   <component name="ProjectId" id="1Qox38RU6BWR9qVBAwTocfZQaOP" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -42,6 +96,35 @@
         </RuleState>
       </list>
     </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="tweet_sentiment" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="datasci_course_materials" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment1" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment1/tweet_sentiment.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.tweet_sentiment" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -60,6 +143,17 @@
       <workItem from="1575402403074" duration="1256000" />
       <workItem from="1575499179203" duration="254000" />
       <workItem from="1575591252913" duration="1754000" />
+      <workItem from="1575940169233" duration="1673000" />
+      <workItem from="1576047527558" duration="1404000" />
+      <workItem from="1576137372516" duration="11478000" />
+      <workItem from="1576249384847" duration="339000" />
+      <workItem from="1576250007931" duration="53000" />
+      <workItem from="1576250223416" duration="8215000" />
+      <workItem from="1576292557134" duration="3418000" />
+      <workItem from="1576544958130" duration="1579000" />
+      <workItem from="1576622606833" duration="2652000" />
+      <workItem from="1577087884183" duration="18267000" />
+      <workItem from="1577582277063" duration="6639000" />
     </task>
     <servers />
   </component>
@@ -78,5 +172,8 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/INF_553$tweet_sentiment.coverage" NAME="tweet_sentiment Coverage Results" MODIFIED="1577090636960" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/assignment1" />
   </component>
 </project>

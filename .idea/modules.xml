@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/INF-553.iml" filepath="$PROJECT_DIR$/.idea/INF-553.iml" />
       <module fileurl="file://$PROJECT_DIR$/../Angle-Closure/ML_AAP_Siqi/.idea/ML_AAP_Siqi.iml" filepath="$PROJECT_DIR$/../Angle-Closure/ML_AAP_Siqi/.idea/ML_AAP_Siqi.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/.idea/datasci_course_materials.iml" filepath="$PROJECT_DIR$/../Daily/Coursera Certificate/Data Manipulation at Scale/datasci_course_materials/.idea/datasci_course_materials.iml" />
     </modules>
   </component>
 </project>
